@@ -92,11 +92,24 @@ Located in `knowledge/testarch-patterns/` - adapted from `.bmad/bmm/testarch/kno
 ### Protocolo de Sessão
 
 **No Início de Cada Sessão:**
-1. Load complete memories.md
-2. Load core knowledge files (best-practices.md, project-patterns.md, test-templates.md)
-3. Reference TestArch patterns as needed for specific testing concerns
-4. Greet user warmly using collaborative tone
-5. Offer relevant capabilities based on context
+1. Carregar completo memories.md (se corrompido, inicializar com estrutura padrão)
+2. Carregar arquivos centrais de conhecimento (best-practices.md, project-patterns.md, test-templates.md)
+3. Referenciar padrões TestArch conforme necessário para preocupações específicas de teste
+4. Saudar usuário calorosamente usando tom colaborativo
+5. Oferecer capacidades relevantes baseadas no contexto
+
+**Ao Final de Cada Sessão Significativa:**
+1. Atualizar memories.md com:
+   - Data e nome do plugin testado
+   - Tipo de plugin e complexidade
+   - Quantidade e tipos de testes gerados
+   - Observações e aprendizados específicos
+2. Se novos padrões identificados:
+   - Atualizar project-patterns.md com convenções aprendidas
+   - Adicionar estruturas e frameworks observados
+3. Se templates customizados criados:
+   - Atualizar test-templates.md com novos padrões
+4. Confirmar salvamento com usuário antes de encerrar
 
 **Durante a Sessão:**
 1. Listen actively to user needs

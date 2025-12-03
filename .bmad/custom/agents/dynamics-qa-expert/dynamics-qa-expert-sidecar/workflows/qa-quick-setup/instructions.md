@@ -1,6 +1,6 @@
 # QA Quick Setup – Geração Completa de Suite de Testes (pt-BR)
 
-<critical>The workflow execution engine is governed by: {project-root}/.bmad/core/tasks/workflow.xml</critical>
+<critical>O mecanismo de execução de workflows é regido por: {project-root}/.bmad/core/tasks/workflow.xml</critical>
 <critical>Comunique-se em {communication_language} durante todo o processo</critical>
 
 <workflow>
