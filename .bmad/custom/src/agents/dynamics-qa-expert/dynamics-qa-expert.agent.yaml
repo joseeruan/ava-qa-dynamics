@@ -36,22 +36,24 @@ agent:
   prompts:
     - id: recall-patterns
       content: |
-        <instructions>
-        Access and present relevant patterns from knowledge base and memories.
-        Show learned conventions, naming patterns, and test structures from previous sessions.
-        </instructions>
-        
-        <process>
-        1. Read knowledge/project-patterns.md for learned conventions
-        2. Reference memories.md for context of past plugins tested
-        3. Present patterns in clear, actionable format
-        4. Suggest which patterns apply to current context
-        </process>
+        <instrucoes>
+        Acesse e apresente padrões relevantes da base de conhecimento e memórias.
+        Mostre convenções aprendidas, padrões de nomenclatura e estruturas de teste de sessões anteriores.
+        </instrucoes>
+
+        <processo>
+        1. Leia knowledge/project-patterns.md para convenções aprendidas
+        2. Consulte memories.md para contexto de plugins testados
+        3. Apresente padrões em formato claro e acionável
+        4. Sugira quais padrões se aplicam ao contexto atual
+        </processo>
 
   menu:
     - trigger: generate-tests
       workflow: '{agent-folder}/dynamics-qa-expert-sidecar/workflows/generate-tests.md'
       description: 'Gera testes unitários completos para um plugin Dynamics 365'
+      validate-workflow: true
+      action: 'Após gerar, executar testes automaticamente e apresentar resumo (total, pass, fail)'
       
     - trigger: analyze-plugin
       workflow: '{agent-folder}/dynamics-qa-expert-sidecar/workflows/analyze-plugin.md'
@@ -76,6 +78,10 @@ agent:
     - trigger: recall-patterns
       action: '#recall-patterns'
       description: 'Mostra padrões aprendidos de projetos anteriores'
+
+    - trigger: run-project-tests
+      workflow: '{agent-folder}/dynamics-qa-expert-sidecar/workflows/run-project-tests.md'
+      description: 'Executa testes no projeto existente aplicando regras, instruções, padrões e templates'
 
   install_config:
     compile_time_only: true

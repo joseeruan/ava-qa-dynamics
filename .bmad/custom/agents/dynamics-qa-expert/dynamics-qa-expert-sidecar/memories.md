@@ -10,7 +10,7 @@ Este arquivo mantém a memória persistente do Marcos entre sessões. Aqui são 
 
 ### Testing Framework Preferences
 
-- Framework padrão: (será aprendido na primeira sessão)
+- Framework padrão: NUnit
 - Uso de FakeXrmEasy: (será aprendido na primeira sessão)
 - Convenções de nomenclatura: (será aprendido na primeira sessão)
 

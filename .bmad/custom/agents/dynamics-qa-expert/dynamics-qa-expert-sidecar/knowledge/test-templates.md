@@ -1,36 +1,35 @@
-# Test Templates - Knowledge Base
+# Templates de Teste - Base de Conhecimento
 
 ## About This File
 
 Este arquivo contém templates customizados de teste que o agente aprende e adapta baseado em feedback e uso contínuo.
 
-## Plugin Test Template
+## Template de Teste de Plugin (NUnit)
 
 ```csharp
 // Template base para testes de plugin
 // Será customizado baseado em padrões aprendidos
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Microsoft.Xrm.Sdk;
 using FakeXrmEasy;
 using System;
 
 namespace [Namespace]
 {
-    [TestClass]
     public class [PluginName]Tests
     {
         private XrmFakedContext _context;
         private IOrganizationService _service;
         
-        [TestInitialize]
-        public void Setup()
+        [SetUp]
+        public void SetUp()
         {
             _context = new XrmFakedContext();
             _service = _context.GetOrganizationService();
         }
         
-        [TestMethod]
+        [Test]
         public void [MethodName]_[Scenario]_[ExpectedResult]()
         {
             // Arrange
@@ -43,7 +42,7 @@ namespace [Namespace]
 }
 ```
 
-## Mock Setup Templates
+## Templates de Setup de Mocks
 
 ```csharp
 // Templates para setup de mocks comuns
@@ -59,33 +58,76 @@ var contextMock = new Mock<IPluginExecutionContext>();
 var serviceProviderMock = new Mock<IServiceProvider>();
 ```
 
-## Scenario Templates
+## Templates de Cenários
 
-### Create Operation Tests
+### Testes de Operação Create
 ```csharp
 // Template para testar operações Create
 // Será customizado por projeto
 ```
 
-### Update Operation Tests
+### Testes de Operação Update
 ```csharp
 // Template para testar operações Update
 // Será customizado por projeto
 ```
 
-### Delete Operation Tests
+### Testes de Operação Delete
 ```csharp
 // Template para testar operações Delete
 // Será customizado por projeto
 ```
 
-### Pre-Validation Tests
+### Testes de Pré-Validação
 ```csharp
 // Template para testar pré-validações
 // Será customizado por projeto
 ```
 
-### Exception Handling Tests
+### Testes de Tratamento de Exceções
+
+## Template de Teste para Azure Functions (NUnit)
+
+```csharp
+using NUnit.Framework;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+
+public class [FunctionName]Tests
+{
+    private HttpClient _httpClient;
+
+    [SetUp]
+    public void SetUp()
+    {
+        var handler = new FakeHttpMessageHandler(); // implemente retornos previsíveis
+        _httpClient = new HttpClient(handler);
+    }
+
+    [Test]
+    public async Task Execute_WithValidPayload_ShouldReturnOk()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/api/[FunctionName]")
+        {
+            Content = new StringContent("{ 'id': '123' }")
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+    }
+}
+
+public class FakeHttpMessageHandler : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        // retornar respostas previsíveis para cenários de teste
+        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
+    }
+}
+```
 ```csharp
 // Template para testar tratamento de exceções
 // Será customizado por projeto

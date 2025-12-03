@@ -1,98 +1,101 @@
-# QA Generate Tests - Granular Test Generation Instructions
+# QA Gerar Testes - Instruções Granulares de Geração de Testes
 
-<critical>The workflow execution engine is governed by: {project-root}/.bmad/core/tasks/workflow.xml</critical>
-<critical>Communicate in {communication_language}</critical>
+<critical>O mecanismo de execução de workflows é regido por: {project-root}/.bmad/core/tasks/workflow.xml</critical>
+<critical>Comunique-se em {communication_language}</critical>
 
 <workflow>
 
-<step n="1" goal="Define generation scope">
-  <ask>What is the path to your Dynamics 365 source code? (Default: {default_source_path})</ask>
-  <action>Store path as {{source_path}}</action>
+<step n="1" goal="Definir escopo de geração">
+  <ask>Qual é o caminho do seu código-fonte do Dynamics 365? (Padrão: {default_source_path})</ask>
+  <action>Armazenar caminho como {{source_path}}</action>
   
-  <ask>What type of tests do you want to generate?
-    1. Unit tests only
-    2. Integration tests only
-    3. Both unit and integration tests
+  <ask>Qual tipo de testes você deseja gerar?
+    1. Apenas testes unitários
+    2. Apenas testes de integração
+    3. Ambos (unitário e integração)
   </ask>
-  <action>Store as {{test_type}}</action>
+  <action>Armazenar como {{test_type}}</action>
   
-  <ask>Generation scope:
-    1. All components (full project)
-    2. Specific component types (plugins, workflows, APIs)
-    3. Specific files or classes
+  <ask>Escopo de geração:
+    1. Todos os componentes (projeto completo)
+    2. Tipos específicos (plugins, workflows, APIs)
+    3. Arquivos ou classes específicas
   </ask>
-  <action>Store as {{generation_scope}}</action>
+  <action>Armazenar como {{generation_scope}}</action>
   
-  <action if="scope=specific types">Ask which types: Plugins, Workflows, Custom APIs, PCF</action>
-  <action if="scope=specific files">Ask for file paths or class names (comma-separated)</action>
+  <action if="scope=specific types">Perguntar quais tipos: Plugins, Workflows, Custom APIs, PCF</action>
+  <action if="scope=specific files">Solicitar caminhos de arquivos ou nomes de classes (separados por vírgula)</action>
 </step>
 
-<step n="2" goal="Verify test project exists">
-  <action>Check if test project exists at: {test_output_location}</action>
+<step n="2" goal="Verificar se o projeto de testes existe">
+  <action>Checar se o projeto de testes existe em: {test_output_location}</action>
   
   <check if="test project exists">
-    <action>Confirm: "Test project found at {test_output_location}"</action>
-    <ask>Use this location? [y/n]</ask>
-    <action if="no">Ask for alternative test project path</action>
+    <action>Confirmar: "Projeto de testes encontrado em {test_output_location}"</action>
+    <ask>Usar este local? [s/n]</ask>
+    <action if="no">Solicitar caminho alternativo para projeto de testes</action>
   </check>
   
   <check if="test project does NOT exist">
-    <ask>No test project found. Would you like to:
-      1. Create test project now (recommended)
-      2. Specify different location
-      3. Cancel and run [QS] Quick Setup first
+    <ask>Nenhum projeto de testes encontrado. Você gostaria de:
+      1. Criar projeto de testes agora (recomendado)
+      2. Especificar local diferente
+      3. Cancelar e executar [QS] Quick Setup primeiro
     </ask>
     
     <action if="option 1">
-      <action>Create test project structure:
-        - Create directory: {test_output_location}
-        - Create .csproj with {test_framework} references
-        - Create base classes (TestBase, FakeContextFactory)
-        - Create helper directories
+      <action>Criar estrutura do projeto de testes:
+        - Criar diretório: {test_output_location}
+        - Criar .csproj com referências de {test_framework}
+        - Criar classes base (TestBase, FakeContextFactory)
+        - Criar diretórios de helpers
       </action>
     </action>
     
-    <action if="option 2">Ask for test project path and validate</action>
-    <action if="option 3">Exit workflow with message to run Quick Setup</action>
+    <action if="option 2">Solicitar caminho do projeto de testes e validar</action>
+    <action if="option 3">Sair do workflow com mensagem para executar Quick Setup</action>
   </check>
   
   <template-output>test_project_ready</template-output>
 </step>
 
-<step n="3" goal="Scan and analyze target components">
-  <action>Scan {{source_path}} for components matching {{generation_scope}}:</action>
+<step n="3" goal="Escanear e analisar componentes alvo">
+  <action>Escanear {{source_path}} por componentes que correspondam a {{generation_scope}}:</action>
   
   <action>For each target component:
-    - Extract metadata (name, namespace, entity, message, stage)
-    - Parse code structure and logic
-    - Identify decision branches
-    - Identify dependencies and mocks needed
-    - Analyze complexity (cyclomatic complexity)
-    - Identify image requirements (PreImage/PostImage)
-    - Identify InputParameters usage
+    - Extrair metadados (nome, namespace, entidade, mensagem, estágio)
+    - Parsear estrutura e lógica do código
+    - Identificar ramos de decisão
+    - Identificar dependências e mocks necessários
+    - Analisar complexidade (complexidade ciclomática)
+    - Identificar requisitos de imagens (PreImage/PostImage)
+    - Identificar uso de InputParameters
+    - Enumerar todos os métodos public/protected e responsabilidades
+    - Mapear invariantes e regras de integridade (segurança, depth, validação, efeitos colaterais)
   </action>
   
   <action>Build generation plan:
-    - List of components to generate tests for
-    - For each: estimated test count, complexity level
-    - Total estimated tests
-    - Estimated generation time
+    - Lista de componentes para gerar testes
+    - Para cada componente: quantidade estimada de testes, nível de complexidade
+    - Para cada método: testes unitários requeridos para validar invariantes e integridade
+    - Total estimado de testes
+    - Tempo estimado de geração
   </action>
   
-  <action>Display generation plan to user</action>
-  <ask>Proceed with generation? [y/n/adjust]</ask>
+  <action>Exibir plano de geração ao usuário</action>
+  <ask>Prosseguir com a geração? [s/n/ajustar]</ask>
   
-  <action if="adjust">Allow user to exclude specific components or adjust scope</action>
-  <action if="no">Exit workflow</action>
+  <action if="adjust">Permitir excluir componentes específicos ou ajustar escopo</action>
+  <action if="no">Sair do workflow</action>
   
   <template-output>generation_plan</template-output>
 </step>
 
-<step n="4" goal="Generate unit tests" if="test_type includes unit">
-  <action>For each component in generation plan:</action>
+<step n="4" goal="Gerar testes unitários" if="test_type includes unit">
+  <action>Para cada componente no plano de geração:</action>
   
   <substep n="4a" title="Load appropriate template">
-    <action>Load template from {templates_path} based on component type:
+    <action>Carregar template em {templates_path} conforme tipo do componente:
       - Plugin → plugin-test-template.cs
       - Workflow Activity → workflow-test-template.cs
       - Custom API → api-test-template.cs
@@ -101,50 +104,60 @@
   </substep>
   
   <substep n="4b" title="Generate test class">
-    <action>Create test class file: {{ComponentName}}Tests.cs</action>
-    <action>Set namespace to match project structure</action>
-    <action>Add class-level XML documentation based on {comment_level}</action>
-    <action>Inherit from TestBase</action>
-    <action>Add test framework attributes ([TestClass] or [TestFixture])</action>
+    <action>Criar arquivo de classe de teste: {{ComponentName}}Tests.cs</action>
+    <action>Definir namespace para corresponder à estrutura do projeto</action>
+    <action>Adicionar documentação XML em nível de classe de acordo com {comment_level}</action>
+    <action>Herdar de TestBase</action>
+    <action>Adicionar atributos do framework de teste ([TestFixture] para NUnit)</action>
   </substep>
   
   <substep n="4c" title="Generate setup method">
-    <action>Create Setup/Initialize method:
-      - Initialize FakeXrmEasy context
-      - Register plugin with correct configuration
-      - Create common test data
-      - Setup mock services
+    <action>Criar método de Setup/Initialize:
+      - Inicializar contexto FakeXrmEasy
+      - Registrar plugin com configuração correta
+      - Criar dados de teste comuns
+      - Configurar serviços mock
     </action>
-    <action>Add comments explaining setup based on {comment_level}</action>
+    <action>Adicionar comentários explicando o setup conforme {comment_level}</action>
   </substep>
   
   <substep n="4d" title="Generate test methods for each execution path">
-    <action>For each identified code path:</action>
+    <action>Para cada caminho de código identificado:</action>
     
     <action>Create test method:
-      - Name: Execute_When{{Condition}}_Should{{ExpectedBehavior}}
-      - Arrange: Setup test data, configure mocks, prepare entity
-      - Act: Execute plugin/component
-      - Assert: Verify expected outcomes
+      - Nome: Execute_When{{Condition}}_Should{{ExpectedBehavior}}
+      - Arrange: Preparar dados de teste, configurar mocks, preparar entidade
+      - Act: Executar plugin/componente
+      - Assert: Verificar resultados esperados
     </action>
     
     <action>Add detailed comments based on {comment_level}:
-      - Detailed: Explain every line (why we arrange this way, what we're testing, why assertion matters)
-      - Standard: Explain test purpose and key assertions
-      - Minimal: Test name only (self-documenting)
+      - Detailed: Explicar cada linha (por que organizamos assim, o que está sendo testado, por que a asserção importa)
+      - Standard: Explicar propósito do teste e asserções principais
+      - Minimal: Apenas nome do teste (auto-documentado)
     </action>
     
     <action>Example tests to generate:
-      - Happy path (normal execution)
-      - Edge cases (boundary values, empty data)
-      - Error scenarios (null values, missing fields, invalid data)
-      - Permission scenarios (different user roles)
-      - Image scenarios (with/without PreImage/PostImage)
+      - Happy path (execução normal)
+      - Edge cases (valores de limite, dados vazios)
+      - Error scenarios (valores nulos, campos ausentes, dados inválidos)
+      - Permission scenarios (diferentes perfis de usuário)
+      - Image scenarios (com/sem PreImage/PostImage)
+      - Depth safety (validar context.Depth para evitar loops de reentrada)
+      - Checagens de integridade por método (invariantes, pré/pós-condições, validação de efeitos colaterais)
+      - Correção de InputParameters e OutputParameters
+    </action>
+
+    <action>For plugins with multiple methods (helpers/services inside the class):
+      - Gerar testes unitários para TODOS os métodos public/protected
+      - Validar invariantes e regras de integridade para cada método
+      - Usar mocks/fakes para isolar dependências externas
+      - Garantir que os testes permaneçam independentes e determinísticos
     </action>
   </substep>
   
   <substep n="4e" title="Generate helper methods if needed">
-    <action>If component has complex setup, create helper methods:
+    <action>Se o componente tiver setup complexo, criar métodos auxiliares:
       - CreateTestEntity{{EntityName}}()
       - SetupMock{{ServiceName}}()
       - AssertExpected{{Behavior}}()
@@ -152,125 +165,126 @@
   </substep>
   
   <substep n="4f" title="Save test file">
-    <action>Save to: {test_output_location}/UnitTests/{{ComponentName}}Tests.cs</action>
-    <action>Format code properly (indentation, spacing)</action>
-    <action>Add file header with generation timestamp and DQA attribution</action>
+    <action>Salvar em: {test_output_location}/UnitTests/{{ComponentName}}Tests.cs</action>
+    <action>Formatar o código apropriadamente (indentação, espaçamento)</action>
+    <action>Adicionar cabeçalho com timestamp de geração e atribuição DQA</action>
   </substep>
   
-  <action>Report progress: "Generated unit tests for {{component_name}} ({{test_count}} tests)"</action>
+  <action>Reportar progresso: "Testes unitários gerados para {{component_name}} ({{test_count}} testes)"</action>
   
   <template-output>unit_tests_progress</template-output>
 </step>
 
-<step n="5" goal="Generate integration tests" if="test_type includes integration">
-  <action>Identify integration test scenarios:</action>
+<step n="5" goal="Gerar testes de integração" if="test_type includes integration">
+  <action>Identificar cenários de testes de integração:</action>
   
-  <action>Scan for multi-component interactions:
-    - Plugin chains (Plugin A → triggers → Plugin B)
-    - Create/Update cascades
-    - Workflow triggers from plugins
-    - Cross-entity dependencies
+  <action>Escanear interações multi-componentes:
+    - Cadeias de plugins (Plugin A → triggers → Plugin B)
+    - Cascatas de Create/Update
+    - Workflows acionados por plugins
+    - Dependências cross-entity
   </action>
   
-  <action>For each integration scenario:</action>
+  <action>Para cada cenário de integração:</action>
   
   <substep n="5a" title="Generate integration test class">
-    <action>Create: {{ScenarioName}}IntegrationTests.cs</action>
-    <action>Setup complete FakeXrmEasy environment:
-      - Register all involved plugins with correct stages
-      - Setup entity metadata
-      - Configure relationships
-      - Prepare initial data
+    <action>Criar: {{ScenarioName}}IntegrationTests.cs</action>
+    <action>Configurar ambiente completo FakeXrmEasy:
+      - Registrar todos os plugins envolvidos com estágios corretos
+      - Configurar metadados de entidades
+      - Configurar relacionamentos
+      - Preparar dados iniciais
     </action>
   </substep>
   
   <substep n="5b" title="Generate integration test method">
-    <action>Create test method:
-      - Name: IntegrationTest_{{ScenarioDescription}}
-      - Arrange: Setup full context with all artifacts
-      - Act: Trigger initial action (e.g., Create entity)
-      - Assert: Verify complete pipeline execution and end state
+    <action>Criar método de teste:
+      - Nome: IntegrationTest_{{ScenarioDescription}}
+      - Arrange: Configurar contexto completo com todos artefatos
+      - Act: Acionar ação inicial (ex.: Create de entidade)
+      - Assert: Verificar execução completa do pipeline e estado final
     </action>
     
-    <action>Add comments explaining:
-      - What pipeline sequence is being tested
-      - Which artifacts execute in which order
-      - What the final expected state is
-      - Why this integration matters
+    <action>Adicionar comentários explicando:
+      - Qual sequência de pipeline está sendo testada
+      - Quais artefatos executam em qual ordem
+      - Qual é o estado final esperado
+      - Por que esta integração importa
     </action>
   </substep>
   
   <substep n="5c" title="Save integration test file">
-    <action>Save to: {test_output_location}/IntegrationTests/{{ScenarioName}}IntegrationTests.cs</action>
+    <action>Salvar em: {test_output_location}/IntegrationTests/{{ScenarioName}}IntegrationTests.cs</action>
   </substep>
   
-  <action>Report progress: "Generated integration tests for {{scenario_name}}"</action>
+  <action>Reportar progresso: "Testes de integração gerados para {{scenario_name}}"</action>
   
   <template-output>integration_tests_progress</template-output>
 </step>
 
-<step n="6" goal="Generate test data helpers" optional="true">
-  <ask>Generate test data helper classes? (Recommended for consistency) [y/n]</ask>
+<step n="6" goal="Gerar helpers de dados de teste" optional="true">
+  <ask>Gerar classes helper de dados de teste? (Recomendado para consistência) [s/n]</ask>
   
   <action if="yes">
-    <action>Create TestDataFactory.cs:
-      - Methods to create common test entities
-      - Methods to setup common relationships
-      - Methods to create mock users and teams
-      - Constants for commonly used test values
+    <action>Criar TestDataFactory.cs:
+      - Métodos para criar entidades comuns de teste
+      - Métodos para configurar relacionamentos comuns
+      - Métodos para criar usuários e equipes mock
+      - Constantes para valores de teste frequentemente usados
     </action>
     
-    <action>Add extensive XML documentation</action>
-    <action>Save to: {test_output_location}/Helpers/TestDataFactory.cs</action>
+    <action>Adicionar documentação XML extensa</action>
+    <action>Salvar em: {test_output_location}/Helpers/TestDataFactory.cs</action>
   </action>
   
   <template-output>test_data_helpers</template-output>
 </step>
 
-<step n="7" goal="Validate and compile">
-  <action>Validate generated test files:
-    - Check syntax (no compilation errors)
-    - Verify all references resolved
-    - Ensure proper namespaces
-    - Check test framework attributes correct
+<step n="7" goal="Validar e compilar">
+  <action>Validar arquivos de teste gerados:
+    - Checar sintaxe (sem erros de compilação)
+    - Verificar todas as referências resolvidas
+    - Garantir namespaces corretos
+    - Checar atributos do framework de teste corretos
+    - Validar cobertura dos invariantes e regras de integridade mapeadas
   </action>
   
-  <ask>Attempt to build test project now? [y/n]</ask>
+  <ask>Tentar compilar o projeto de testes agora? [s/n]</ask>
   
   <action if="yes">
-    <action>Run: dotnet build {test_output_location}</action>
-    <action>Display build output</action>
+    <action>Executar: dotnet build {test_output_location}</action>
+    <action>Exibir saída da compilação</action>
     
     <check if="build successful">
-      <action>✅ Build successful! Tests ready to run.</action>
+      <action>✅ Build bem-sucedido! Testes prontos para rodar.</action>
     </check>
     
     <check if="build failed">
-      <action>⚠️ Build failed. Review errors and fix before running tests.</action>
-      <action>Display compilation errors with file/line numbers</action>
+      <action>⚠️ Build falhou. Revise erros e corrija antes de rodar os testes.</action>
+      <action>Exibir erros de compilação com arquivo/linha</action>
     </check>
   </action>
   
   <template-output>build_validation</template-output>
 </step>
 
-<step n="8" goal="Generate summary report">
-  <action>Compile generation summary:</action>
+<step n="8" goal="Gerar relatório resumido">
+  <action>Compilar resumo da geração:</action>
   
   <section name="Generation Summary">
-    - Source path: {{source_path}}
-    - Test project: {test_output_location}
-    - Test framework: {test_framework}
-    - Generation scope: {{generation_scope}}
-    - Test types: {{test_type}}
+    - Caminho de origem: {{source_path}}
+    - Projeto de testes: {test_output_location}
+    - Framework de testes: {test_framework}
+    - Escopo de geração: {{generation_scope}}
+    - Tipos de testes: {{test_type}}
   </section>
   
   <section name="Tests Generated">
-    - Unit test classes: {{unit_test_classes_count}}
-    - Unit test methods: {{unit_test_methods_count}}
-    - Integration test classes: {{integration_test_classes_count}}
-    - Integration test methods: {{integration_test_methods_count}}
-    - Total tests: {{total_test_count}}
+    - Classes de teste unitário: {{unit_test_classes_count}}
+    - Métodos de teste unitário: {{unit_test_methods_count}}
+    - Classes de teste de integração: {{integration_test_classes_count}}
+    - Métodos de teste de integração: {{integration_test_methods_count}}
+    - Total de testes: {{total_test_count}}
   </section>
   
   <section name="Files Created">
@@ -278,22 +292,22 @@
   </section>
   
   <section name="Next Steps">
-    1. Review generated tests in: {test_output_location}
-    2. Customize tests as needed for your specific scenarios
-    3. Run tests: `dotnet test {test_output_location}`
-    4. Add tests to source control
-    5. Integrate into CI/CD pipeline
+    1. Revisar testes gerados em: {test_output_location}
+    2. Customizar testes conforme seus cenários específicos
+    3. Rodar testes: `dotnet test {test_output_location}`
+    4. Adicionar testes ao controle de versão
+    5. Integrar ao pipeline de CI/CD
   </section>
   
   <section name="Running Tests">
-    ```bash
+    ```cmd
     cd {test_output_location}
     dotnet test
     
-    # Run specific test class
+    rem Rodar classe de teste específica
     dotnet test --filter "FullyQualifiedName~{{TestClassName}}"
     
-    # Run with detailed output
+    rem Rodar com saída detalhada
     dotnet test --logger "console;verbosity=detailed"
     ```
   </section>
@@ -301,20 +315,20 @@
   <template-output>generation_summary</template-output>
 </step>
 
-<step n="9" goal="Completion">
-  <action>✅ Test generation complete! 🎉</action>
+<step n="9" goal="Conclusão">
+  <action>✅ Geração de testes concluída! 🎉</action>
   
   <action>Provide quick actions:
-    - [V] View generation summary
-    - [R] Run tests now
-    - [G] Generate more tests (different scope)
-    - [E] Exit
+    - [V] Ver resumo da geração
+    - [R] Rodar testes agora
+    - [G] Gerar mais testes (escopo diferente)
+    - [E] Sair
   </action>
   
-  <action if="V">Display full summary report</action>
-  <action if="R">Execute: dotnet test {test_output_location}</action>
-  <action if="G">Restart workflow from step 1</action>
-  <action if="E">Thank user and exit</action>
+  <action if="V">Exibir relatório completo</action>
+  <action if="R">Executar: dotnet test {test_output_location}</action>
+  <action if="G">Reiniciar workflow a partir do passo 1</action>
+  <action if="E">Agradecer ao usuário e sair</action>
 </step>
 
 </workflow>

@@ -1,49 +1,49 @@
-## Agent Creation Complete! 🎉
+## Criação do Agente Concluída! 🎉
 
-### Agent Summary
+### Resumo do Agente
 
-- **Name:** Marcos 🧪
-- **Type:** Expert Agent
-- **Purpose:** Criar testes unitários para plugins Dynamics 365
-- **Status:** ✅ Ready for activation
+- **Nome:** Marcos 🧪
+- **Tipo:** Expert Agent
+- **Propósito:** Criar testes unitários para plugins Dynamics 365 e Azure Functions
+- **Status:** ✅ Pronto para ativação
 
-### Agent Features
+### Recursos do Agente
 
-**Core Capabilities:**
-1. Gerar testes unitários completos para plugins Dynamics 365
-2. Analisar plugins e criar estrutura de projeto de testes
+**Capacidades Centrais:**
+1. Gerar testes unitários completos para plugins Dynamics 365 e Azure Functions
+2. Analisar código (plugins e funções) e criar estrutura de projeto de testes
 3. Revisar testes existentes e sugerir melhorias
 4. Gerar relatórios de cobertura de testes
-5. Ensinar boas práticas de testes para Dynamics 365
+5. Ensinar boas práticas de testes para Dynamics 365 e Azure Functions
 6. Aprender padrões do projeto ao longo do tempo
 7. Recordar padrões aprendidos de projetos anteriores
 
-**Expert Agent Features:**
+**Recursos de Expert Agent:**
 - Memória persistente (memories.md)
 - Base de conhecimento em evolução (knowledge/)
 - Workflows personalizados no sidecar
 - Aprendizado contínuo com uso
-- Domain restrictions para segurança
+- Restrições de domínio para segurança
 
-### File Locations
+### Localização de Arquivos
 
-**Agent Configuration:**
-- Main: `.bmad/custom/src/agents/dynamics-qa-expert/dynamics-qa-expert.agent.yaml`
+**Configuração do Agente:**
+- Principal: `.bmad/custom/src/agents/dynamics-qa-expert/dynamics-qa-expert.agent.yaml`
 
-**Sidecar Workspace:**
-- Location: `.bmad/custom/src/agents/dynamics-qa-expert/dynamics-qa-expert-sidecar/`
-- Files:
-  - memories.md (persistent memory)
-  - instructions.md (private protocols)
+**Workspace do Sidecar:**
+- Local: `.bmad/custom/src/agents/dynamics-qa-expert/dynamics-qa-expert-sidecar/`
+- Arquivos:
+  - memories.md (memória persistente)
+  - instructions.md (protocolos privados)
   - knowledge/project-patterns.md
   - knowledge/test-templates.md
   - knowledge/best-practices.md
-  - workflows/ (ready for 5 workflows)
+  - workflows/ (pronto para 5 workflows)
 
-**Customization:**
-- File: `.bmad/_cfg/agents/custom-dynamics-qa-expert.customize.yaml`
+**Customização:**
+- Arquivo: `.bmad/_cfg/agents/custom-dynamics-qa-expert.customize.yaml`
 
-**Documentation:**
+**Documentação:**
 - agent-purpose-BMADV3.md
 - agent-persona-BMADV3.md
 - agent-commands-BMADV3.md
@@ -55,20 +55,21 @@
 - agent-build-BMADV3.md
 - agent-completion-BMADV3.md
 
-### Activation Guidance
+### Guia de Ativação
 
-**Getting Started:**
+**Primeiros Passos:**
 
-1. **Locate agent files** at `.bmad/custom/src/agents/dynamics-qa-expert/`
-2. **Agent will compile** when BMAD build tools become available
-3. **Customization ready** via `.bmad/_cfg/agents/custom-dynamics-qa-expert.customize.yaml`
-4. **First interactions:**
-   - "Olá Marcos, o que você pode me ajudar?"
-   - "Me mostre suas capacidades"
-   - "Gerar testes para plugin de Contact"
-   - "Ensinar boas práticas de testes"
+1. **Localize os arquivos do agente** em `.bmad/custom/src/agents/dynamics-qa-expert/`
+2. **Agente será compilado** quando as ferramentas BMAD estiverem disponíveis
+3. **Customização pronta** via `.bmad/_cfg/agents/custom-dynamics-qa-expert.customize.yaml`
+4. **Interações iniciais:**
+  - "Olá Marcos, no que você pode ajudar?"
+  - "Mostre suas capacidades"
+  - "Gerar testes para plugin de Contact"
+  - "Gerar testes para Azure Function X"
+  - "Ensinar boas práticas de testes"
 
-**Commands Available:**
+**Comandos Disponíveis:**
 - `generate-tests` - Gera testes unitários completos
 - `analyze-plugin` - Analisa plugin e sugere estrutura
 - `review-tests` - Revisa testes existentes
@@ -77,53 +78,53 @@
 - `learn` - Aprende padrões do projeto
 - `recall-patterns` - Lembra padrões aprendidos
 
-### Next Steps
+### Próximos Passos
 
-**Immediate Actions:**
-- ✅ Test drive the agent with different commands
-- ✅ Create the 5 sidecar workflows (generate-tests, analyze-plugin, review-tests, coverage-report, teach-practices)
-- ✅ Customize personality if desired via customization file
-- ✅ Start using Marcos to generate tests for your Dynamics plugins
+**Ações Imediatas:**
+- ✅ Testar o agente com diferentes comandos
+- ✅ Criar os 5 workflows do sidecar (generate-tests, analyze-plugin, review-tests, coverage-report, teach-practices)
+- ✅ Customizar a personalidade se desejado via arquivo de customização
+- ✅ Usar o Marcos para gerar testes para seus plugins e funções Azure
 
-**Future Possibilities:**
-- Teach Marcos your project-specific patterns
-- Expand knowledge base with custom templates
-- Add new commands via customization file
-- Share Marcos with your team
-- Create complementary agents for other QA tasks
+**Possibilidades Futuras:**
+- Ensinar ao Marcos padrões específicos do seu projeto
+- Expandir a base de conhecimento com templates customizados
+- Adicionar novos comandos via arquivo de customização
+- Compartilhar o Marcos com sua equipe
+- Criar agentes complementares para outras tarefas de QA
 
-### Creation Journey Summary
+### Resumo da Criação
 
-**What We Accomplished:**
-1. ✅ Purpose discovery - QA specialist for Dynamics 365
-2. ✅ Persona development - Collaborative team-oriented expert
-3. ✅ Command structure - 7 powerful capabilities
-4. ✅ Identity establishment - Marcos 🧪, the testing specialist
-5. ✅ YAML generation - Complete expert agent configuration
-6. ✅ Quality validation - BMAD Quality Certified badge
-7. ✅ Workspace setup - Complete sidecar with memories and knowledge
-8. ✅ Customization file - Ready for future tweaking
+**Conquistas:**
+1. ✅ Descoberta de propósito — especialista em QA para Dynamics 365 e Azure Functions
+2. ✅ Desenvolvimento de persona — especialista colaborativo e orientado à equipe
+3. ✅ Estrutura de comandos — 7 capacidades poderosas
+4. ✅ Estabelecimento de identidade — Marcos 🧪, o especialista em testes
+5. ✅ Geração de YAML — configuração completa de Expert Agent
+6. ✅ Validação de qualidade — selo BMAD
+7. ✅ Setup do workspace — sidecar completo com memórias e conhecimento
+8. ✅ Arquivo de customização — pronto para ajustes futuros
 
-### Quality Certification
+### Certificação de Qualidade
 
 🏆 **BMAD Quality Certified**
 
-All validation checks passed:
-- ✅ Configuration structure validated
-- ✅ Command functionality verified
-- ✅ Persona properly balanced
-- ✅ Expert agent features implemented
-- ✅ Sidecar structure complete
-- ✅ Documentation comprehensive
+Todas as verificações passaram:
+- ✅ Estrutura de configuração validada
+- ✅ Funcionalidade de comandos verificada
+- ✅ Persona equilibrada
+- ✅ Recursos de Expert Agent implementados
+- ✅ Estrutura do sidecar completa
+- ✅ Documentação abrangente
 
 ---
 
-**Workflow Status:** ✅ COMPLETE
+**Status de Workflows:** ✅ CONCLUÍDO
 
-**Agent Created:** December 2, 2025
+**Agente Criado:** December 2, 2025
 
-**Agent Creator:** Jose (via BMad Builder)
+**Criador do Agente:** Jose (via BMad Builder)
 
-**Result:** Fully functional Expert Agent ready for deployment and immediate use! 🚀
+**Resultado:** Expert Agent funcional pronto para implantação e uso imediato! 🚀
 
-**Congratulations on creating Marcos - your Dynamics 365 Unit Test Specialist! Amazing work! 🎉**
+**Parabéns por criar o Marcos — seu Especialista em Testes para Dynamics 365! 🎉**

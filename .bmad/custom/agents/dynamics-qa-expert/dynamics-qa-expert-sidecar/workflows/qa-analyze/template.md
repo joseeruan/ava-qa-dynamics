@@ -1,3 +1,34 @@
+# QA Analisar - Template de Relatório de Análise
+
+## Resumo Executivo
+- Artefatos analisados: {{artifact_count}}
+- Dependências mapeadas: {{dependency_count}}
+- Áreas de alto risco no pipeline: {{high_risk_areas}}
+## Inventário de Artefatos
+{{artifact_inventory}}
+
+## Mapa de Dependências
+{{dependency_map}}
+
+## Análise de Pipeline
+{{pipeline_analysis}}
+
+## Issues de Qualidade
+{{quality_issues}}
+
+## Métricas de Qualidade (Análise Profunda)
+{{quality_metrics}}
+
+## Recomendações
+{{recommendations}}
+
+## Sugestões de Visualização (opcional)
+{{visualization_guide}}
+
+## Observações Finais
+- Revisar recomendações e priorizar correções
+- Usar QA Revisão de Código para detecção focada de anti-padrões
+- Usar QA Gerar Testes para melhorar cobertura em áreas críticas (NUnit)
 ---
 analysis_date: {{date}}
 project_path: {{source_path}}
