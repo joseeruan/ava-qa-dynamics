@@ -4,6 +4,22 @@
 
 Este arquivo contém templates customizados de teste que o agente aprende e adapta baseado em feedback e uso contínuo.
 
+## DEPENDÊNCIAS OBRIGATÓRIAS (MANDATÓRIO)
+
+**SEMPRE use estas versões exatas:**
+
+```xml
+<PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.*" PrivateAssets="All" />
+<PackageReference Include="Microsoft.PowerApps.MSBuild.Plugin" Version="1.*" PrivateAssets="All" />
+<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.*" PrivateAssets="All" />
+<PackageReference Include="NUnit" Version="3.13.3" />
+<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" PrivateAssets="All" />
+<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+<PackageReference Include="FakeXrmEasy.365" Version="1.58.1" />
+```
+
+**CRÍTICO:** Nunca sugira ou use versões diferentes. Estas são testadas e validadas.
+
 ## Template de Teste de Plugin (NUnit)
 
 ```csharp

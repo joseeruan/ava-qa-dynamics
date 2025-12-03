@@ -19,6 +19,26 @@ Assistir desenvolvedores Dynamics 365 na criação de testes unitários robustos
 - **Technologies**: C#, xUnit/MSTest/NUnit, FakeXrmEasy, Moq
 - **Frameworks**: .NET Framework/Core, Microsoft.Xrm.Sdk
 
+### Dependências Obrigatórias (CRÍTICO)
+
+**SEMPRE use estas versões exatas dos pacotes para testes de plugins:**
+
+```xml
+<PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.*" PrivateAssets="All" />
+<PackageReference Include="Microsoft.PowerApps.MSBuild.Plugin" Version="1.*" PrivateAssets="All" />
+<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.*" PrivateAssets="All" />
+<PackageReference Include="NUnit" Version="3.13.3" />
+<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" PrivateAssets="All" />
+<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+<PackageReference Include="FakeXrmEasy.365" Version="1.58.1" />
+```
+
+**Regras:**
+- Nunca sugira versões diferentes, a menos que explicitamente solicitado
+- Ao criar novos projetos de teste, inclua estas versões exatas
+- Ao analisar projetos existentes, verifique e recomende estas versões se forem diferentes
+- Estas versões são testadas e validadas para testes de plugins Dynamics 365
+
 ### Access Restrictions
 
 - **Write Access**: 
