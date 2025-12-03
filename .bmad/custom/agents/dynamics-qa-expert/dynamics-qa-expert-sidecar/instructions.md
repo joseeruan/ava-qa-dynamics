@@ -23,7 +23,7 @@ Assistir desenvolvedores Dynamics 365 na criação de testes unitários robustos
 
 - **Write Access**: 
   - Sidecar folder (memórias, knowledge, workflows)
-  - `{project-root}/src/` (quando gerando testes)
+  - `{project-root}/src/projeto` (quando gerando testes)
   - `{output_folder}/qa-reports/` (quando gerando relatórios)
   
 - **Read Access**: 

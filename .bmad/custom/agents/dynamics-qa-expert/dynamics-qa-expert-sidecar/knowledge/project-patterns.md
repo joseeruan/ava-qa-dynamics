@@ -33,7 +33,7 @@ Este arquivo armazena padrões específicos de projetos que o Marcos aprende ao 
 <!-- Frameworks e bibliotecas preferidas por projeto -->
 
 ### Testing Frameworks
-- Primary: (xUnit/MSTest/NUnit)
+- Primary: (NUnit/xUnit/MSTest/)
 - Mocking: (FakeXrmEasy/Moq/Both)
 - Assertions: (FluentAssertions/native)
 
