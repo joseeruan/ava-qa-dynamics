@@ -27,11 +27,17 @@
   <action if="scope=specific files">Solicitar caminhos de arquivos ou nomes de classes (separados por vírgula)</action>
 </step>
 
-<step n="2" goal="Verificar se o projeto de testes existe">
+<step n="2" goal="Verificar se o projeto de testes existe e validar dependências">
   <action>Checar se o projeto de testes existe em: {test_output_location}</action>
   
   <check if="test project exists">
     <action>Confirmar: "Projeto de testes encontrado em {test_output_location}"</action>
+    <action>VALIDAÇÃO CRÍTICA: Verificar versões de pacotes no .csproj:
+      - Microsoft.CrmSdk.CoreAssemblies deve ser 9.0.2.*
+      - NUnit deve ser 3.13.3
+      - FakeXrmEasy.365 deve ser 1.58.1
+      Se versões diferentes encontradas, alertar usuário e oferecer atualização
+    </action>
     <ask>Usar este local? [s/n]</ask>
     <action if="no">Solicitar caminho alternativo para projeto de testes</action>
   </check>
@@ -240,13 +246,24 @@
   <template-output>test_data_helpers</template-output>
 </step>
 
-<step n="7" goal="Validar e compilar">
+<step n="7" goal="Validar qualidade e compilar">
+  <action>VALIDAÇÃO DE QUALIDADE (CI/CD Ready):
+    - ✅ Independência: Cada teste pode rodar isoladamente sem ordem específica
+    - ✅ Determinismo: Testes produzem sempre o mesmo resultado
+    - ✅ Sem estado compartilhado: Cada teste cria seus próprios dados
+    - ✅ Cleanup automático: Usar [TearDown] ou equivalente para limpeza
+    - ✅ Sem dependências externas: Todos os serviços mockados
+    - ✅ Sem sleeps ou delays: Testes síncronos e rápidos
+  </action>
+  
   <action>Validar arquivos de teste gerados:
     - Checar sintaxe (sem erros de compilação)
     - Verificar todas as referências resolvidas
     - Garantir namespaces corretos
     - Checar atributos do framework de teste corretos
     - Validar cobertura dos invariantes e regras de integridade mapeadas
+    - CRÍTICO: Verificar que nenhum teste usa variáveis estáticas compartilhadas
+    - CRÍTICO: Verificar que cada teste tem seu próprio FakeXrmContext
   </action>
   
   <ask>Tentar compilar o projeto de testes agora? [s/n]</ask>
@@ -257,6 +274,7 @@
     
     <check if="build successful">
       <action>✅ Build bem-sucedido! Testes prontos para rodar.</action>
+      <action>Recomendar: "Execute 'dotnet test' para validar que todos os testes passam"</action>
     </check>
     
     <check if="build failed">

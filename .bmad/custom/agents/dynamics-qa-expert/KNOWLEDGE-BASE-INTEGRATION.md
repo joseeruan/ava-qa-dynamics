@@ -1,10 +1,10 @@
-# Knowledge Base Integration - Dynamics QA Expert
+# Integração da Base de Conhecimento - Dynamics QA Expert
 
 ## 📋 Resumo da Integração
 
 O agente **Dynamics QA Expert** agora tem acesso a **padrões de teste universais** do BMM TestArch, adaptados para uso com C#/Dynamics 365/NUnit/FakeXrmEasy.
 
-**Data da integração**: December 3, 2025
+**Data da integração**: 3 de Dezembro de 2025
 
 ---
 

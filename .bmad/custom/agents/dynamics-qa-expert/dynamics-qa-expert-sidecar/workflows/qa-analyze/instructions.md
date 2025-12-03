@@ -1,6 +1,6 @@
 # QA Analisar - Instruções de Análise Profunda do Projeto
 
-<critical>The workflow execution engine is governed by: {project-root}/.bmad/core/tasks/workflow.xml</critical>
+<critical>O mecanismo de execução de workflows é regido por: {project-root}/.bmad/core/tasks/workflow.xml</critical>
 <critical>Este é um workflow de DOCUMENTO - gera relatório de análise em markdown em {default_output_file}</critical>
 <critical>Comunique-se em {communication_language}</critical>
 
@@ -25,29 +25,29 @@
   <action>Escanear recursivamente {{source_path}} por todas customizações do Dynamics:</action>
   
   <action>Encontrar Plugins:
-    - Search for classes implementing IPlugin interface
-    - Extract: Name, namespace, target entity, message, stage, execution mode
-    - Parse registered steps if plugin registration code exists
+    - Buscar classes que implementam interface IPlugin
+    - Extrair: Nome, namespace, entidade alvo, mensagem, estágio, modo de execução
+    - Analisar registered steps se código de registro de plugin existir
   </action>
   
   <action>Encontrar Custom Workflow Activities:
-    - Search for classes inheriting CodeActivity
-    - Extract: Name, input/output parameters, business logic summary
+    - Buscar classes que herdam de CodeActivity
+    - Extrair: Nome, parâmetros de entrada/saída, resumo da lógica de negócio
   </action>
   
   <action>Encontrar Custom APIs:
-    - Search for Custom API definitions (JSON, code, or comments)
-    - Extract: Name, bound entity, parameters, permissions
+    - Buscar definições de Custom API (JSON, código, ou comentários)
+    - Extrair: Nome, entidade vinculada, parâmetros, permissões
   </action>
   
   <action>Encontrar PCF Controls:
-    - Look for PCF project structures
-    - Extract: Control name, properties, events
+    - Procurar estruturas de projeto PCF
+    - Extrair: Nome do controle, propriedades, eventos
   </action>
   
   <action>Encontrar JavaScript Web Resources:
-    - Look for .js files with Dataverse context usage
-    - Extract: Form events, ribbon commands, custom logic
+    - Procurar arquivos .js com uso de contexto Dataverse
+    - Extrair: Eventos de formulário, comandos de ribbon, lógica customizada
   </action>
   
   <template-output>artifact_inventory</template-output>
@@ -57,23 +57,23 @@
   <action>Para cada artefato, identificar dependências:</action>
   
   <action>Dependências diretas:
-    - Entity references (lookup fields)
-    - Shared utility classes
-    - External service calls
-    - Configuration entities
+    - Referências de entidades (campos de lookup)
+    - Classes utilitárias compartilhadas
+    - Chamadas de serviços externos
+    - Entidades de configuração
   </action>
   
   <action>Dependências de execução:
-    - Plugin A updates field that triggers Plugin B
-    - Plugin creates record that starts Power Automate
-    - Form script validates data before plugin runs
+    - Plugin A atualiza campo que dispara Plugin B
+    - Plugin cria registro que inicia Power Automate
+    - Script de formulário valida dados antes do plugin executar
   </action>
   
   <action>Construir grafo de dependências:
-    - Nodes: Artifacts
-    - Edges: Dependencies (with type: data, execution, utility)
-    - Identify circular dependencies
-    - Identify single points of failure
+    - Nós: Artefatos
+    - Arestas: Dependências (com tipo: dados, execução, utilitário)
+    - Identificar dependências circulares
+    - Identificar pontos únicos de falha
   </action>
   
   <template-output>dependency_map</template-output>
@@ -83,31 +83,31 @@
   <action>Para cada entidade que possui customizações:</action>
   
   <action>Build execution timeline for each message (Create, Update, Delete):
-    1. PreValidation sync plugins
-    2. PreOperation sync plugins
-    3. Core platform operation
-    4. PostOperation sync plugins
-    5. PostOperation async plugins
+    1. Plugins síncronos PreValidation
+    2. Plugins síncronos PreOperation
+    3. Operação da plataforma core
+    4. Plugins síncronos PostOperation
+    5. Plugins assíncronos PostOperation
     6. Power Automate/workflows
   </action>
   
   <action>Identificar conflitos de execução:
-    - Multiple plugins on same stage/message for same entity
-    - Order dependencies not explicitly set
-    - Sync plugin that should be async (long-running)
-    - Async plugin that should be sync (immediate validation)
+    - Múltiplos plugins no mesmo estágio/mensagem para a mesma entidade
+    - Dependências de ordem não explicitamente definidas
+    - Plugin síncrono que deveria ser assíncrono (longa duração)
+    - Plugin assíncrono que deveria ser síncrono (validação imediata)
   </action>
   
   <action>Identificar riscos de loop infinito:
-    - Plugin A updates entity X, triggering Plugin B
-    - Plugin B updates entity X, triggering Plugin A again
-    - No depth check or depth > reasonable threshold
+    - Plugin A atualiza entidade X, disparando Plugin B
+    - Plugin B atualiza entidade X, disparando Plugin A novamente
+    - Sem verificação de profundidade ou profundidade > limite razoável
   </action>
   
   <action>Mapear requisitos de imagens:
-    - Which plugins need PreImage
-    - Which plugins need PostImage
-    - Missing image registrations
+    - Quais plugins precisam de PreImage
+    - Quais plugins precisam de PostImage
+    - Registros de imagem ausentes
   </action>
   
   <template-output>pipeline_analysis</template-output>

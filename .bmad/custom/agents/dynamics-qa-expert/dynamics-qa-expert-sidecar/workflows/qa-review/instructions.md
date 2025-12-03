@@ -1,6 +1,6 @@
 # QA Revisão de Código - Instruções de Análise Automática de Qualidade
 
-<critical>The workflow execution engine is governed by: {project-root}/.bmad/core/tasks/workflow.xml</critical>
+<critical>O mecanismo de execução de workflows é regido por: {project-root}/.bmad/core/tasks/workflow.xml</critical>
 <critical>Este é um workflow de DOCUMENTO - gera relatório de revisão em markdown em {default_output_file}</critical>
 <critical>Comunique-se em {communication_language}</critical>
 
@@ -16,26 +16,26 @@
   <action>Armazenar como {{review_scope}}</action>
   
   <action if="scope=full project">
-    <ask>Source path? (Default: {default_source_path})</ask>
-    <action>Store as {{review_path}}</action>
+    <ask>Caminho do código-fonte? (Padrão: {default_source_path})</ask>
+    <action>Armazenar como {{review_path}}</action>
   </action>
   
   <action if="scope=recent changes">
-    <ask>Compare against which branch? (Default: main)</ask>
-    <action>Store as {{base_branch}}</action>
-    <action>Use git diff to identify changed files</action>
-    <action>Store changed files as {{review_files}}</action>
+    <ask>Comparar com qual branch? (Padrão: main)</ask>
+    <action>Armazenar como {{base_branch}}</action>
+    <action>Usar git diff para identificar arquivos alterados</action>
+    <action>Armazenar arquivos alterados como {{review_files}}</action>
   </action>
   
   <action if="scope=specific files">
-    <ask>Enter file paths (comma-separated) or class names:</ask>
-    <action>Store as {{review_files}}</action>
+    <ask>Digite caminhos de arquivos (separados por vírgula) ou nomes de classes:</ask>
+    <action>Armazenar como {{review_files}}</action>
   </action>
   
   <action if="scope=pull request">
-    <ask>PR number or branch name:</ask>
-    <action>Fetch PR diff and extract changed files</action>
-    <action>Store as {{review_files}} and {{pr_context}}</action>
+    <ask>Número do PR ou nome do branch:</ask>
+    <action>Buscar diff do PR e extrair arquivos alterados</action>
+    <action>Armazenar como {{review_files}} e {{pr_context}}</action>
   </action>
   
   <ask>Rigor da revisão: {antipattern_strictness} - Alterar? [s/n]</ask>
@@ -54,26 +54,26 @@
   </action>
   
   <action>Preparar regras de detecção para:
-    - Missing depth validation
-    - Unhandled exceptions
-    - Unpaginated queries
-    - Hardcoded GUIDs
-    - Missing null checks
-    - Synchronous HTTP calls
-    - Missing tracing
-    - Image access without validation
-    - And 20+ more patterns...
+    - Validação de profundidade ausente
+    - Exceções não tratadas
+    - Consultas sem paginação
+    - GUIDs hardcoded
+    - Verificações de null ausentes
+    - Chamadas HTTP síncronas
+    - Tracing ausente
+    - Acesso a imagens sem validação
+    - E mais de 20 padrões...
   </action>
 </step>
 
 <step n="3" goal="Analisar código por anti-padrões">
   <action>Para cada arquivo em {{review_files}}:</action>
   
-  <action>Parsear estrutura do código:
-    - Identify classes and methods
-    - Extract logic flow
-    - Map dependencies
-    - Calculate cyclomatic complexity
+  <action>Analisar estrutura do código:
+    - Identificar classes e métodos
+    - Extrair fluxo lógico
+    - Mapear dependências
+    - Calcular complexidade ciclomática
   </action>
   
   <action>Executar detecção de anti-padrões:</action>
