@@ -1,0 +1,236 @@
+name: qa-generate-tests
+description: Gera testes unitários e de integração para componentes Dynamics 365 usando FakeXrmEasy
+version: 1.0.0-mvp
+author: BMAD AVA Module
+category: quality-assurance
+
+inputs:
+  - name: project_path
+    description: Caminho do projeto Dynamics
+    type: string
+    required: true
+    default: "{{config.project_src_path}}"
+
+  - name: test_framework
+    description: Framework de teste a usar
+    type: string
+    required: false
+    default: "{{config.test_framework}}"
+    options:
+      - xunit
+      - nunit
+      - mstest
+
+  - name: test_types
+    description: Tipos de testes a gerar
+    type: array
+    required: false
+    default: ["unit", "integration"]
+    options:
+      - unit
+      - integration
+
+  - name: components_filter
+    description: Filtro de componentes (all, plugins, workflows, custom_apis)
+    type: string
+    required: false
+    default: all
+
+  - name: test_output_path
+    description: Caminho onde criar projeto de testes
+    type: string
+    required: false
+    default: "{{config.test_project_path}}"
+
+  - name: fakexrmeasy_version
+    description: Versão do FakeXrmEasy
+    type: string
+    required: false
+    default: "{{config.fakexrmeasy_version}}"
+
+outputs:
+  - name: tests_created
+    description: Número de testes criados
+    type: number
+
+  - name: test_project_path
+    description: Caminho do projeto de testes criado
+    type: string
+
+  - name: coverage_estimate
+    description: Estimativa de cobertura de código
+    type: string
+
+steps:
+  - id: analyze-project
+    name: Analisar projeto (se ainda não analisado)
+    action: run_workflow
+    params:
+      workflow: qa-analyze
+      inputs:
+        project_path: "{{inputs.project_path}}"
+        analysis_depth: standard
+      cache: true
+
+  - id: validate-test-path
+    name: Validar/criar caminho de testes
+    action: ensure_directory
+    params:
+      path: "{{inputs.test_output_path}}"
+      create_if_missing: true
+
+  - id: create-test-project
+    name: Criar projeto de testes
+    action: create_csproj
+    params:
+      path: "{{inputs.test_output_path}}"
+      name: "{{project_name}}.Tests"
+      framework: "{{inputs.test_framework}}"
+      packages:
+        - "{{inputs.test_framework}}"
+        - "FakeXrmEasy.Core@{{inputs.fakexrmeasy_version}}"
+        - "FakeXrmEasy.Plugins@{{inputs.fakexrmeasy_version}}"
+        - "Microsoft.PowerPlatform.Dataverse.Client"
+
+  - id: create-test-structure
+    name: Criar estrutura de diretórios de teste
+    action: create_directories
+    params:
+      base: "{{inputs.test_output_path}}"
+      dirs:
+        - "Unit/Plugins"
+        - "Unit/Workflows"
+        - "Unit/CustomAPIs"
+        - "Integration"
+        - "Helpers"
+        - "Fixtures"
+
+  - id: generate-test-helpers
+    name: Gerar classes helper
+    action: generate_from_template
+    params:
+      template: "@templates/test-helpers.cs"
+      output: "{{inputs.test_output_path}}/Helpers/TestHelpers.cs"
+      variables:
+        namespace: "{{project_namespace}}.Tests"
+        test_framework: "{{inputs.test_framework}}"
+
+  - id: generate-base-test-class
+    name: Gerar classe base de testes
+    action: generate_from_template
+    params:
+      template: "@templates/base-test-class.cs"
+      output: "{{inputs.test_output_path}}/Helpers/BasePluginTest.cs"
+      variables:
+        namespace: "{{project_namespace}}.Tests"
+        test_framework: "{{inputs.test_framework}}"
+        fakexrmeasy_version: "{{inputs.fakexrmeasy_version}}"
+
+  - id: filter-components
+    name: Filtrar componentes para testar
+    action: filter_data
+    params:
+      data: "{{steps.analyze-project.components_found}}"
+      filter: "{{inputs.components_filter}}"
+
+  - id: generate-unit-tests
+    name: Gerar testes unitários
+    condition: "{{contains(inputs.test_types, 'unit')}}"
+    action: generate_tests
+    params:
+      type: unit
+      components: "{{steps.filter-components}}"
+      template: "@templates/unit-test.cs"
+      output_base: "{{inputs.test_output_path}}/Unit"
+      knowledge:
+        - "@knowledge/fakexrmeasy-patterns.md"
+        - "@knowledge/best-practices.md"
+      test_scenarios:
+        - happy_path
+        - null_validation
+        - exception_handling
+        - depth_check
+        - preimage_postimage
+
+  - id: generate-integration-tests
+    name: Gerar testes de integração
+    condition: "{{contains(inputs.test_types, 'integration')}}"
+    action: generate_tests
+    params:
+      type: integration
+      components: "{{steps.filter-components}}"
+      template: "@templates/integration-test.cs"
+      output_base: "{{inputs.test_output_path}}/Integration"
+      knowledge:
+        - "@knowledge/fakexrmeasy-patterns.md"
+        - "@knowledge/pipeline-execution-order.md"
+      test_scenarios:
+        - multi_plugin_flow
+        - pipeline_execution_order
+        - related_entity_operations
+        - preimage_postimage_flow
+
+  - id: generate-test-data-fixtures
+    name: Gerar fixtures de dados de teste
+    action: generate_from_template
+    params:
+      template: "@templates/test-fixtures.cs"
+      output: "{{inputs.test_output_path}}/Fixtures/EntityFixtures.cs"
+      variables:
+        namespace: "{{project_namespace}}.Tests"
+        entities: "{{steps.analyze-project.entities_used}}"
+
+  - id: calculate-coverage
+    name: Calcular estimativa de cobertura
+    action: estimate_coverage
+    params:
+      components_total: "{{steps.filter-components.count}}"
+      tests_generated: "{{steps.generate-unit-tests.count + steps.generate-integration-tests.count}}"
+
+  - id: generate-readme
+    name: Gerar README do projeto de testes
+    action: generate_from_template
+    params:
+      template: "@templates/test-project-readme.md"
+      output: "{{inputs.test_output_path}}/README.md"
+      variables:
+        project_name: "{{project_name}}"
+        test_framework: "{{inputs.test_framework}}"
+        tests_created: "{{steps.generate-unit-tests.count + steps.generate-integration-tests.count}}"
+        coverage_estimate: "{{steps.calculate-coverage.percentage}}"
+
+  - id: output-summary
+    name: Apresentar resumo
+    action: output
+    params:
+      message: |
+        ✅ Testes gerados com sucesso!
+        
+        📊 Resumo:
+        - Testes unitários: {{steps.generate-unit-tests.count}}
+        - Testes de integração: {{steps.generate-integration-tests.count}}
+        - Total de testes: {{steps.generate-unit-tests.count + steps.generate-integration-tests.count}}
+        - Cobertura estimada: {{steps.calculate-coverage.percentage}}%
+        
+        📁 Projeto criado em: {{inputs.test_output_path}}
+        
+        🚀 Próximos passos:
+        1. Abrir solução de testes no Visual Studio
+        2. Restaurar pacotes NuGet
+        3. Executar testes: dotnet test
+        4. Revisar e customizar testes conforme necessário
+
+hooks:
+  on_error:
+    - log_error
+    - cleanup_partial_generation
+    - notify_user
+
+  on_success:
+    - log_success
+    - suggest_test_run
+
+metadata:
+  execution_time_estimate: "1-5 min"
+  complexity: high
+  requires_config: true

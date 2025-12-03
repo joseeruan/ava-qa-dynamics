@@ -1,0 +1,220 @@
+using System;
+using FakeXrmEasy;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
+{{#if (eq test_framework "xunit")}}
+using Xunit;
+{{/if}}
+{{#if (eq test_framework "nunit")}}
+using NUnit.Framework;
+{{/if}}
+{{#if (eq test_framework "mstest")}}
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+{{/if}}
+
+namespace {{namespace}}.Helpers
+{
+    /// <summary>
+    /// Helper methods for test data creation and common assertions
+    /// </summary>
+    public static class TestHelpers
+    {
+        /// <summary>
+        /// Creates a test Account entity with common fields
+        /// </summary>
+        public static Entity CreateAccount(string name, decimal revenue = 0)
+        {
+            return new Entity("account")
+            {
+                Id = Guid.NewGuid(),
+                ["name"] = name,
+                ["revenue"] = revenue > 0 ? new Money(revenue) : null,
+                ["createdon"] = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Creates a test Contact entity with common fields
+        /// </summary>
+        public static Entity CreateContact(string firstName, string lastName, EntityReference parentAccount = null)
+        {
+            return new Entity("contact")
+            {
+                Id = Guid.NewGuid(),
+                ["firstname"] = firstName,
+                ["lastname"] = lastName,
+                ["parentcustomerid"] = parentAccount,
+                ["createdon"] = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Creates a plugin context for testing
+        /// </summary>
+        public static XrmFakedPluginExecutionContext CreatePluginContext(
+            string messageName,
+            int stage,
+            string primaryEntityName,
+            Entity target = null,
+            Guid userId = default)
+        {
+            var context = new XrmFakedPluginExecutionContext
+            {
+                MessageName = messageName,
+                Stage = stage,
+                PrimaryEntityName = primaryEntityName,
+                UserId = userId == default ? Guid.NewGuid() : userId,
+                OrganizationId = Guid.NewGuid(),
+                InitiatingUserId = userId == default ? Guid.NewGuid() : userId,
+                Depth = 1
+            };
+
+            if (target != null)
+            {
+                context.InputParameters["Target"] = target;
+            }
+
+            return context;
+        }
+
+        /// <summary>
+        /// Adds PreImage to plugin context
+        /// </summary>
+        public static void AddPreImage(this XrmFakedPluginExecutionContext context, string imageName, Entity preImage)
+        {
+            context.PreEntityImages.Add(imageName, preImage);
+        }
+
+        /// <summary>
+        /// Adds PostImage to plugin context
+        /// </summary>
+        public static void AddPostImage(this XrmFakedPluginExecutionContext context, string imageName, Entity postImage)
+        {
+            context.PostEntityImages.Add(imageName, postImage);
+        }
+
+        /// <summary>
+        /// Initializes FakeXrmEasy context with test data
+        /// </summary>
+        public static void InitializeWithData(this XrmFakedContext context, params Entity[] entities)
+        {
+            context.Initialize(entities);
+        }
+
+        /// <summary>
+        /// Retrieves all records of a specific entity type
+        /// </summary>
+        public static EntityCollection RetrieveAll(this IOrganizationService service, string entityName, params string[] columns)
+        {
+            var query = new QueryExpression(entityName)
+            {
+                ColumnSet = columns.Length > 0 ? new ColumnSet(columns) : new ColumnSet(true)
+            };
+            return service.RetrieveMultiple(query);
+        }
+
+        /// <summary>
+        /// Retrieves records by attribute value
+        /// </summary>
+        public static EntityCollection RetrieveBy(
+            this IOrganizationService service, 
+            string entityName, 
+            string attributeName, 
+            object value)
+        {
+            var query = new QueryExpression(entityName)
+            {
+                ColumnSet = new ColumnSet(true),
+                Criteria = new FilterExpression
+                {
+                    Conditions =
+                    {
+                        new ConditionExpression(attributeName, ConditionOperator.Equal, value)
+                    }
+                }
+            };
+            return service.RetrieveMultiple(query);
+        }
+
+        /// <summary>
+        /// Asserts that entity contains expected attribute value
+        /// </summary>
+        public static void AssertAttributeEquals(Entity entity, string attributeName, object expectedValue)
+        {
+            {{#if (eq test_framework "xunit")}}
+            Assert.True(entity.Contains(attributeName), $"Entity does not contain attribute '{attributeName}'");
+            Assert.Equal(expectedValue, entity[attributeName]);
+            {{/if}}
+            {{#if (eq test_framework "nunit")}}
+            Assert.That(entity.Contains(attributeName), Is.True, $"Entity does not contain attribute '{attributeName}'");
+            Assert.That(entity[attributeName], Is.EqualTo(expectedValue));
+            {{/if}}
+            {{#if (eq test_framework "mstest")}}
+            Assert.IsTrue(entity.Contains(attributeName), $"Entity does not contain attribute '{attributeName}'");
+            Assert.AreEqual(expectedValue, entity[attributeName]);
+            {{/if}}
+        }
+
+        /// <summary>
+        /// Asserts that collection contains exactly one entity
+        /// </summary>
+        public static Entity AssertSingleEntity(EntityCollection collection)
+        {
+            {{#if (eq test_framework "xunit")}}
+            Assert.Single(collection.Entities);
+            {{/if}}
+            {{#if (eq test_framework "nunit")}}
+            Assert.That(collection.Entities.Count, Is.EqualTo(1));
+            {{/if}}
+            {{#if (eq test_framework "mstest")}}
+            Assert.AreEqual(1, collection.Entities.Count);
+            {{/if}}
+            return collection.Entities[0];
+        }
+
+        /// <summary>
+        /// Asserts that collection is empty
+        /// </summary>
+        public static void AssertEmpty(EntityCollection collection)
+        {
+            {{#if (eq test_framework "xunit")}}
+            Assert.Empty(collection.Entities);
+            {{/if}}
+            {{#if (eq test_framework "nunit")}}
+            Assert.That(collection.Entities, Is.Empty);
+            {{/if}}
+            {{#if (eq test_framework "mstest")}}
+            Assert.AreEqual(0, collection.Entities.Count);
+            {{/if}}
+        }
+
+        /// <summary>
+        /// Creates EntityReference
+        /// </summary>
+        public static EntityReference CreateReference(string entityName, Guid id, string name = null)
+        {
+            var reference = new EntityReference(entityName, id);
+            if (!string.IsNullOrEmpty(name))
+            {
+                reference.Name = name;
+            }
+            return reference;
+        }
+
+        /// <summary>
+        /// Creates OptionSetValue
+        /// </summary>
+        public static OptionSetValue CreateOptionSet(int value)
+        {
+            return new OptionSetValue(value);
+        }
+
+        /// <summary>
+        /// Creates Money value
+        /// </summary>
+        public static Money CreateMoney(decimal value)
+        {
+            return new Money(value);
+        }
+    }
+}

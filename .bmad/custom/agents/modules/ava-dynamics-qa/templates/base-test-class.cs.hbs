@@ -1,0 +1,133 @@
+using System;
+using FakeXrmEasy;
+using Microsoft.Xrm.Sdk;
+{{#if (eq test_framework "xunit")}}
+using Xunit;
+{{/if}}
+{{#if (eq test_framework "nunit")}}
+using NUnit.Framework;
+{{/if}}
+{{#if (eq test_framework "mstest")}}
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+{{/if}}
+
+namespace {{namespace}}.Helpers
+{
+    /// <summary>
+    /// Base class for plugin tests providing common setup and utilities
+    /// </summary>
+    {{#if (eq test_framework "nunit")}}
+    [TestFixture]
+    {{/if}}
+    {{#if (eq test_framework "mstest")}}
+    [TestClass]
+    {{/if}}
+    public abstract class BasePluginTest
+    {
+        protected XrmFakedContext Context { get; private set; }
+        protected IOrganizationService Service { get; private set; }
+        protected ITracingService TracingService { get; private set; }
+
+        {{#if (eq test_framework "xunit")}}
+        protected BasePluginTest()
+        {
+            InitializeContext();
+        }
+        {{/if}}
+        
+        {{#if (eq test_framework "nunit")}}
+        [SetUp]
+        public void Setup()
+        {
+            InitializeContext();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // Cleanup if needed
+        }
+        {{/if}}
+
+        {{#if (eq test_framework "mstest")}}
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            InitializeContext();
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            // Cleanup if needed
+        }
+        {{/if}}
+
+        private void InitializeContext()
+        {
+            Context = new XrmFakedContext();
+            Service = Context.GetOrganizationService();
+            TracingService = Context.GetTracingService();
+        }
+
+        /// <summary>
+        /// Executes plugin with given context
+        /// </summary>
+        protected void ExecutePlugin<T>(XrmFakedPluginExecutionContext pluginContext) where T : IPlugin, new()
+        {
+            var plugin = new T();
+            Context.ExecutePluginWith(pluginContext, plugin);
+        }
+
+        /// <summary>
+        /// Creates standard plugin context for Create message
+        /// </summary>
+        protected XrmFakedPluginExecutionContext CreateContext(Entity target, int stage = 20)
+        {
+            return TestHelpers.CreatePluginContext("Create", stage, target.LogicalName, target);
+        }
+
+        /// <summary>
+        /// Creates standard plugin context for Update message
+        /// </summary>
+        protected XrmFakedPluginExecutionContext UpdateContext(Entity target, int stage = 20)
+        {
+            return TestHelpers.CreatePluginContext("Update", stage, target.LogicalName, target);
+        }
+
+        /// <summary>
+        /// Creates standard plugin context for Delete message
+        /// </summary>
+        protected XrmFakedPluginExecutionContext DeleteContext(EntityReference target, int stage = 10)
+        {
+            var context = TestHelpers.CreatePluginContext("Delete", stage, target.LogicalName);
+            context.InputParameters["Target"] = target;
+            return context;
+        }
+
+        /// <summary>
+        /// Gets trace log from tracing service
+        /// </summary>
+        protected string GetTraceLog()
+        {
+            return TracingService.DumpTrace();
+        }
+
+        /// <summary>
+        /// Asserts that trace log contains specific message
+        /// </summary>
+        protected void AssertTraceContains(string expectedMessage)
+        {
+            var trace = GetTraceLog();
+            {{#if (eq test_framework "xunit")}}
+            Assert.Contains(expectedMessage, trace);
+            {{/if}}
+            {{#if (eq test_framework "nunit")}}
+            Assert.That(trace, Does.Contain(expectedMessage));
+            {{/if}}
+            {{#if (eq test_framework "mstest")}}
+            Assert.IsTrue(trace.Contains(expectedMessage), $"Trace does not contain: {expectedMessage}");
+            {{/if}}
+        }
+    }
+}

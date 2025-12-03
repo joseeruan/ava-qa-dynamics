@@ -1,0 +1,290 @@
+name: qa-quick-setup
+description: Setup completo all-in-one - analisa projeto, gera testes, e prepara infraestrutura de QA
+version: 1.0.0-mvp
+author: BMAD AVA Module
+category: quality-assurance
+
+inputs:
+  - name: project_path
+    description: Caminho do projeto Dynamics
+    type: string
+    required: true
+    default: "{{config.project_src_path}}"
+
+  - name: test_framework
+    description: Framework de teste
+    type: string
+    required: false
+    default: "{{config.test_framework}}"
+    options:
+      - xunit
+      - nunit
+      - mstest
+
+  - name: include_review
+    description: Incluir code review na análise
+    type: boolean
+    required: false
+    default: true
+
+  - name: interactive_mode
+    description: Modo interativo (pausa para confirmações)
+    type: boolean
+    required: false
+    default: true
+
+outputs:
+  - name: setup_complete
+    description: Indica se setup foi completado com sucesso
+    type: boolean
+
+  - name: test_project_path
+    description: Caminho do projeto de testes criado
+    type: string
+
+  - name: quality_score
+    description: Score de qualidade inicial do projeto
+    type: number
+
+  - name: summary
+    description: Resumo do que foi feito
+    type: object
+
+steps:
+  - id: welcome-message
+    name: Mensagem de boas-vindas
+    action: display_message
+    params:
+      message: |
+        🚀 AVA Quick Setup - Configuração Completa de QA
+        
+        Vou preparar tudo que você precisa para começar a testar seu projeto Dynamics 365:
+        
+        ✅ Análise completa do projeto
+        ✅ Detecção de anti-patterns
+        ✅ Criação de projeto de testes
+        ✅ Geração de testes unitários e de integração
+        ✅ Code review automatizado
+        ✅ Relatórios de qualidade
+        
+        Isso vai levar cerca de 2-5 minutos. Vamos começar? 🎯
+      wait_for_confirmation: "{{inputs.interactive_mode}}"
+
+  - id: analyze-project
+    name: "Passo 1/4: Analisando projeto"
+    action: run_workflow
+    params:
+      workflow: qa-analyze
+      inputs:
+        project_path: "{{inputs.project_path}}"
+        analysis_depth: deep
+        output_format: json
+      display_progress: true
+
+  - id: show-analysis-summary
+    name: Mostrar resumo da análise
+    condition: "{{inputs.interactive_mode}}"
+    action: display_message
+    params:
+      message: |
+        📊 Análise completa!
+        
+        Componentes encontrados:
+        - Plugins: {{steps.analyze-project.components_found.plugins.length}}
+        - Workflows: {{steps.analyze-project.components_found.workflows.length}}
+        - Custom APIs: {{steps.analyze-project.components_found.custom_apis.length}}
+        - PCF Controls: {{steps.analyze-project.components_found.pcf_controls.length}}
+        
+        Anti-patterns detectados:
+        - 🔴 HIGH: {{steps.analyze-project.antipatterns_detected.filter(p => p.severity === 'HIGH').length}}
+        - 🟡 MEDIUM: {{steps.analyze-project.antipatterns_detected.filter(p => p.severity === 'MEDIUM').length}}
+        - 🟢 LOW: {{steps.analyze-project.antipatterns_detected.filter(p => p.severity === 'LOW').length}}
+        
+        Continuar para geração de testes?
+      wait_for_confirmation: true
+
+  - id: generate-tests
+    name: "Passo 2/4: Gerando testes"
+    action: run_workflow
+    params:
+      workflow: qa-generate-tests
+      inputs:
+        project_path: "{{inputs.project_path}}"
+        test_framework: "{{inputs.test_framework}}"
+        test_types: ["unit", "integration"]
+        components_filter: all
+      display_progress: true
+
+  - id: show-tests-summary
+    name: Mostrar resumo de testes gerados
+    condition: "{{inputs.interactive_mode}}"
+    action: display_message
+    params:
+      message: |
+        ✅ Testes gerados!
+        
+        - Testes criados: {{steps.generate-tests.tests_created}}
+        - Projeto de testes: {{steps.generate-tests.test_project_path}}
+        - Cobertura estimada: {{steps.generate-tests.coverage_estimate}}%
+        
+        Continuar para code review?
+      wait_for_confirmation: true
+
+  - id: run-code-review
+    name: "Passo 3/4: Realizando code review"
+    condition: "{{inputs.include_review}}"
+    action: run_workflow
+    params:
+      workflow: qa-review
+      inputs:
+        project_path: "{{inputs.project_path}}"
+        review_scope: full
+        severity_filter: ["HIGH", "MEDIUM", "LOW"]
+        output_format: json
+      display_progress: true
+
+  - id: show-review-summary
+    name: Mostrar resumo de code review
+    condition: "{{inputs.interactive_mode && inputs.include_review}}"
+    action: display_message
+    params:
+      message: |
+        🎯 Code review completo!
+        
+        Quality Score: {{steps.run-code-review.quality_score}}/100
+        
+        Issues encontrados:
+        - 🔴 CRITICAL: {{steps.run-code-review.issues_found.filter(i => i.severity === 'HIGH').length}}
+        - 🟡 IMPORTANT: {{steps.run-code-review.issues_found.filter(i => i.severity === 'MEDIUM').length}}
+        - 🟢 MINOR: {{steps.run-code-review.issues_found.filter(i => i.severity === 'LOW').length}}
+        
+        Continuar para relatório final?
+      wait_for_confirmation: true
+
+  - id: generate-final-report
+    name: "Passo 4/4: Gerando relatório final"
+    action: generate_report
+    params:
+      template: "@templates/quick-setup-report.md"
+      output: "{{config.reports_output_path}}/quick-setup-{{timestamp}}.md"
+      data:
+        project_path: "{{inputs.project_path}}"
+        analysis: "{{steps.analyze-project}}"
+        tests: "{{steps.generate-tests}}"
+        review: "{{steps.run-code-review}}"
+        timestamp: "{{now}}"
+
+  - id: create-getting-started-guide
+    name: Criar guia Getting Started
+    action: generate_from_template
+    params:
+      template: "@templates/getting-started.md"
+      output: "{{steps.generate-tests.test_project_path}}/GETTING_STARTED.md"
+      variables:
+        project_name: "{{project_name}}"
+        test_framework: "{{inputs.test_framework}}"
+        commands:
+          restore: "dotnet restore"
+          build: "dotnet build"
+          test: "dotnet test"
+          coverage: "dotnet test --collect:\"XPlat Code Coverage\""
+
+  - id: final-summary
+    name: Apresentar resumo final
+    action: output
+    params:
+      message: |
+        🎉 Setup completo!
+        
+        ═══════════════════════════════════════════
+        📊 RESUMO DO QUICK SETUP
+        ═══════════════════════════════════════════
+        
+        ✅ Análise de Projeto
+           - Componentes analisados: {{steps.analyze-project.components_found.plugins.length + steps.analyze-project.components_found.workflows.length + steps.analyze-project.components_found.custom_apis.length}}
+           - Anti-patterns encontrados: {{steps.analyze-project.antipatterns_detected.length}}
+           - Pipeline conflicts: {{steps.analyze-project.pipeline_conflicts.length}}
+        
+        ✅ Geração de Testes
+           - Testes criados: {{steps.generate-tests.tests_created}}
+           - Cobertura estimada: {{steps.generate-tests.coverage_estimate}}%
+           - Projeto em: {{steps.generate-tests.test_project_path}}
+        
+        {{#if inputs.include_review}}
+        ✅ Code Review
+           - Quality Score: {{steps.run-code-review.quality_score}}/100
+           - Issues HIGH: {{steps.run-code-review.issues_found.filter(i => i.severity === 'HIGH').length}}
+           - Recomendações: {{steps.run-code-review.recommendations.length}}
+        {{/if}}
+        
+        ═══════════════════════════════════════════
+        🚀 PRÓXIMOS PASSOS
+        ═══════════════════════════════════════════
+        
+        1. Abrir projeto de testes:
+           cd {{steps.generate-tests.test_project_path}}
+        
+        2. Restaurar dependências:
+           dotnet restore
+        
+        3. Executar testes:
+           dotnet test
+        
+        4. Ver relatório de cobertura:
+           dotnet test --collect:"XPlat Code Coverage"
+        
+        5. Revisar issues encontrados:
+           Ver arquivo: {{config.reports_output_path}}/quick-setup-{{timestamp}}.md
+        
+        {{#if (gt steps.run-code-review.issues_found.filter(i => i.severity === 'HIGH').length 0)}}
+        ⚠️  ATENÇÃO: Foram encontrados {{steps.run-code-review.issues_found.filter(i => i.severity === 'HIGH').length}} issues CRÍTICOS!
+        Recomendo revisar antes de prosseguir.
+        {{/if}}
+        
+        ═══════════════════════════════════════════
+        💡 DICAS DA AVA
+        ═══════════════════════════════════════════
+        
+        - Use [GT] para gerar testes adicionais
+        - Use [RV] para revisar código específico
+        - Use [AN] para re-analisar após mudanças
+        
+        Precisa de ajuda? Só me chamar! 🤖
+      display: true
+
+  - id: mark-complete
+    name: Marcar setup como completo
+    action: set_output
+    params:
+      setup_complete: true
+      test_project_path: "{{steps.generate-tests.test_project_path}}"
+      quality_score: "{{steps.run-code-review.quality_score}}"
+      summary:
+        components_analyzed: "{{steps.analyze-project.components_found}}"
+        tests_created: "{{steps.generate-tests.tests_created}}"
+        issues_found: "{{steps.run-code-review.issues_found.length}}"
+        reports_generated:
+          - "{{config.reports_output_path}}/quick-setup-{{timestamp}}.md"
+          - "{{steps.generate-tests.test_project_path}}/GETTING_STARTED.md"
+
+hooks:
+  on_error:
+    - log_error
+    - save_progress
+    - display_error_message
+    - suggest_recovery
+
+  on_success:
+    - log_success
+    - celebrate
+    - suggest_next_workflow
+
+  on_cancel:
+    - save_progress
+    - display_cancel_message
+
+metadata:
+  execution_time_estimate: "2-5 min"
+  complexity: high
+  requires_config: true
+  interactive: true

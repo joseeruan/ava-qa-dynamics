@@ -1,0 +1,176 @@
+name: qa-analyze
+description: Analisa estrutura de projeto Dynamics 365 identificando plugins, workflows, custom APIs, PCF controls e possíveis conflitos de pipeline
+version: 1.0.0-mvp
+author: BMAD AVA Module
+category: quality-assurance
+
+inputs:
+  - name: project_path
+    description: Caminho do projeto Dynamics a ser analisado
+    type: string
+    required: true
+    default: "{{config.project_src_path}}"
+
+  - name: analysis_depth
+    description: Profundidade da análise (quick, standard, deep)
+    type: string
+    required: false
+    default: "{{config.analysis_depth}}"
+    options:
+      - quick
+      - standard
+      - deep
+
+  - name: output_format
+    description: Formato do relatório de análise
+    type: string
+    required: false
+    default: markdown
+    options:
+      - markdown
+      - json
+      - console
+
+outputs:
+  - name: analysis_report
+    description: Relatório completo da análise do projeto
+    type: string
+
+  - name: components_found
+    description: Lista de componentes Dynamics encontrados
+    type: object
+
+  - name: antipatterns_detected
+    description: Lista de anti-patterns detectados
+    type: array
+
+  - name: pipeline_conflicts
+    description: Possíveis conflitos de execução no pipeline
+    type: array
+
+steps:
+  - id: validate-project-path
+    name: Validar caminho do projeto
+    action: validate_path
+    params:
+      path: "{{inputs.project_path}}"
+      must_exist: true
+      type: directory
+
+  - id: scan-project-structure
+    name: Escanear estrutura do projeto
+    action: scan_directory
+    params:
+      path: "{{inputs.project_path}}"
+      patterns:
+        - "**/*.cs"
+        - "**/*.csproj"
+        - "**/*.ts"
+        - "**/*.tsx"
+      exclude:
+        - "**/node_modules/**"
+        - "**/bin/**"
+        - "**/obj/**"
+
+  - id: identify-components
+    name: Identificar componentes Dynamics
+    action: analyze_code
+    params:
+      files: "{{steps.scan-project-structure.files}}"
+      detect:
+        - plugins: "IPlugin"
+        - workflows: "CodeActivity"
+        - custom_apis: "IPlugin.*CustomAPI"
+        - pcf_controls: "IInputs|IOutputs"
+        - entities: "Entity"
+
+  - id: analyze-plugins
+    name: Analisar plugins encontrados
+    action: deep_analyze
+    params:
+      component_type: plugin
+      files: "{{steps.identify-components.plugins}}"
+      checks:
+        - depth_validation
+        - null_checks
+        - exception_handling
+        - tracing_usage
+        - preimage_postimage_access
+        - stage_appropriateness
+
+  - id: detect-antipatterns
+    name: Detectar anti-patterns
+    action: pattern_matching
+    params:
+      files: "{{steps.scan-project-structure.files}}"
+      knowledge_base: "@knowledge/antipatterns.md"
+      patterns:
+        - missing_depth_validation
+        - queries_without_paging
+        - hardcoded_guids
+        - missing_null_checks
+        - sync_heavy_operations
+        - missing_try_catch
+        - no_tracing_service
+        - unsafe_image_access
+
+  - id: analyze-pipeline-order
+    name: Analisar ordem de execução do pipeline
+    action: pipeline_analysis
+    params:
+      plugins: "{{steps.identify-components.plugins}}"
+      knowledge_base: "@knowledge/pipeline-execution-order.md"
+      detect_conflicts:
+        - same_stage_multiple_plugins
+        - image_dependencies
+        - execution_order_issues
+
+  - id: calculate-complexity
+    name: Calcular métricas de complexidade
+    action: complexity_metrics
+    params:
+      files: "{{steps.scan-project-structure.files}}"
+      metrics:
+        - cyclomatic_complexity
+        - lines_of_code
+        - method_count
+        - dependency_graph
+
+  - id: generate-report
+    name: Gerar relatório de análise
+    action: generate_report
+    params:
+      format: "{{inputs.output_format}}"
+      template: "@templates/analysis-report.md"
+      data:
+        project_path: "{{inputs.project_path}}"
+        analysis_depth: "{{inputs.analysis_depth}}"
+        components: "{{steps.identify-components}}"
+        plugins_analysis: "{{steps.analyze-plugins}}"
+        antipatterns: "{{steps.detect-antipatterns}}"
+        pipeline_conflicts: "{{steps.analyze-pipeline-order}}"
+        complexity: "{{steps.calculate-complexity}}"
+        timestamp: "{{now}}"
+
+  - id: output-results
+    name: Apresentar resultados
+    action: output
+    params:
+      report: "{{steps.generate-report.content}}"
+      save_to: "{{config.analysis_output_path}}/analysis-{{timestamp}}.{{inputs.output_format}}"
+      display: true
+
+hooks:
+  on_error:
+    - log_error
+    - notify_user
+    - save_partial_results
+
+  on_success:
+    - log_success
+    - suggest_next_steps
+
+metadata:
+  execution_time_estimate: "30s - 2min"
+  complexity: medium
+  requires_config: true

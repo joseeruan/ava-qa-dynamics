@@ -1,0 +1,224 @@
+name: qa-review
+description: Realiza code review automatizado de código Dynamics 365 detectando anti-patterns e sugerindo melhorias
+version: 1.0.0-mvp
+author: BMAD AVA Module
+category: quality-assurance
+
+inputs:
+  - name: project_path
+    description: Caminho do projeto Dynamics a revisar
+    type: string
+    required: true
+    default: "{{config.project_src_path}}"
+
+  - name: review_scope
+    description: Escopo da revisão
+    type: string
+    required: false
+    default: full
+    options:
+      - full
+      - plugins_only
+      - workflows_only
+      - security_only
+
+  - name: severity_filter
+    description: Filtrar apenas issues com severidade específica
+    type: array
+    required: false
+    default: ["HIGH", "MEDIUM", "LOW"]
+    options:
+      - HIGH
+      - MEDIUM
+      - LOW
+
+  - name: output_format
+    description: Formato do relatório de revisão
+    type: string
+    required: false
+    default: markdown
+    options:
+      - markdown
+      - json
+      - console
+      - pr_comment
+
+outputs:
+  - name: review_report
+    description: Relatório completo de code review
+    type: string
+
+  - name: quality_score
+    description: Score de qualidade do código (0-100)
+    type: number
+
+  - name: issues_found
+    description: Lista de issues encontrados
+    type: array
+
+  - name: recommendations
+    description: Recomendações de melhoria
+    type: array
+
+steps:
+  - id: run-analysis
+    name: Executar análise de projeto
+    action: run_workflow
+    params:
+      workflow: qa-analyze
+      inputs:
+        project_path: "{{inputs.project_path}}"
+        analysis_depth: deep
+      cache: true
+
+  - id: categorize-issues
+    name: Categorizar issues por severidade
+    action: categorize
+    params:
+      issues: "{{steps.run-analysis.antipatterns_detected}}"
+      categories:
+        - critical: "{{severity_filter.HIGH}}"
+        - important: "{{severity_filter.MEDIUM}}"
+        - minor: "{{severity_filter.LOW}}"
+
+  - id: analyze-security
+    name: Analisar questões de segurança
+    action: security_scan
+    params:
+      files: "{{steps.run-analysis.components_found}}"
+      checks:
+        - sql_injection_risk
+        - xss_vulnerability
+        - privilege_escalation
+        - insufficient_access_check
+        - sensitive_data_exposure
+        - hardcoded_credentials
+
+  - id: analyze-performance
+    name: Analisar problemas de performance
+    action: performance_scan
+    params:
+      files: "{{steps.run-analysis.components_found}}"
+      checks:
+        - queries_without_paging
+        - n_plus_one_queries
+        - heavy_sync_operations
+        - missing_caching
+        - inefficient_loops
+
+  - id: analyze-maintainability
+    name: Analisar manutenibilidade
+    action: maintainability_scan
+    params:
+      complexity: "{{steps.run-analysis.complexity}}"
+      checks:
+        - high_cyclomatic_complexity
+        - large_methods
+        - duplicate_code
+        - magic_numbers
+        - missing_documentation
+
+  - id: check-best-practices
+    name: Verificar best practices Dynamics
+    action: best_practices_check
+    params:
+      knowledge_base: "@knowledge/best-practices.md"
+      components: "{{steps.run-analysis.components_found}}"
+      checks:
+        - depth_validation
+        - null_checks
+        - exception_handling
+        - tracing_usage
+        - preimage_validation
+        - proper_stage_usage
+
+  - id: generate-fix-suggestions
+    name: Gerar sugestões de correção
+    action: generate_fixes
+    params:
+      issues: "{{steps.categorize-issues}}"
+      knowledge:
+        - "@knowledge/antipatterns.md"
+        - "@knowledge/best-practices.md"
+      include_code_examples: true
+
+  - id: calculate-quality-score
+    name: Calcular score de qualidade
+    action: calculate_score
+    params:
+      issues_critical: "{{steps.categorize-issues.critical.length}}"
+      issues_important: "{{steps.categorize-issues.important.length}}"
+      issues_minor: "{{steps.categorize-issues.minor.length}}"
+      complexity: "{{steps.run-analysis.complexity.avg_complexity}}"
+      test_coverage: "{{steps.run-analysis.estimated_coverage}}"
+      formula: |
+        base_score = 100
+        base_score -= (critical * 10)
+        base_score -= (important * 5)
+        base_score -= (minor * 2)
+        base_score -= (avg_complexity > 10 ? 10 : 0)
+        base_score += (test_coverage > 80 ? 10 : 0)
+        return Math.max(0, base_score)
+
+  - id: prioritize-recommendations
+    name: Priorizar recomendações
+    action: prioritize
+    params:
+      recommendations: "{{steps.generate-fix-suggestions}}"
+      criteria:
+        - impact: HIGH
+        - effort: LOW
+        - risk: HIGH
+      sort_by: priority_score_desc
+
+  - id: generate-review-report
+    name: Gerar relatório de revisão
+    action: generate_report
+    params:
+      format: "{{inputs.output_format}}"
+      template: "@templates/review-report.md"
+      data:
+        project_path: "{{inputs.project_path}}"
+        quality_score: "{{steps.calculate-quality-score.score}}"
+        issues: "{{steps.categorize-issues}}"
+        security: "{{steps.analyze-security}}"
+        performance: "{{steps.analyze-performance}}"
+        maintainability: "{{steps.analyze-maintainability}}"
+        best_practices: "{{steps.check-best-practices}}"
+        recommendations: "{{steps.prioritize-recommendations}}"
+        timestamp: "{{now}}"
+
+  - id: output-results
+    name: Apresentar resultados
+    action: output
+    params:
+      report: "{{steps.generate-review-report.content}}"
+      save_to: "{{config.review_output_path}}/review-{{timestamp}}.{{inputs.output_format}}"
+      display: true
+      summary: |
+        🎯 Quality Score: {{steps.calculate-quality-score.score}}/100
+        
+        Issues encontrados:
+        - 🔴 CRITICAL: {{steps.categorize-issues.critical.length}}
+        - 🟡 IMPORTANT: {{steps.categorize-issues.important.length}}
+        - 🟢 MINOR: {{steps.categorize-issues.minor.length}}
+        
+        Top 3 recomendações:
+        {{#each steps.prioritize-recommendations.top3}}
+        {{@index}}. {{this.title}} (Impacto: {{this.impact}}, Esforço: {{this.effort}})
+        {{/each}}
+
+hooks:
+  on_error:
+    - log_error
+    - save_partial_results
+    - notify_user
+
+  on_success:
+    - log_success
+    - suggest_next_steps
+
+metadata:
+  execution_time_estimate: "1-3 min"
+  complexity: high
+  requires_config: true

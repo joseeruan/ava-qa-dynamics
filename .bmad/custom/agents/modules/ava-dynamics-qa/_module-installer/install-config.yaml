@@ -1,0 +1,124 @@
+# AVA Dynamics QA Module Configuration
+# Pipeline-aware QA automation for Microsoft Dynamics 365
+
+code: ava-dynamics-qa
+name: "AVA Dynamics QA"
+default_selected: true
+
+# Welcome message during installation
+prompt:
+  - "🤖 Welcome to AVA - Your QA Dynamics Assistant!"
+  - "Pipeline-aware test automation for Microsoft Dynamics 365"
+  - ""
+  - "AVA will help you:"
+  - "  ✅ Analyze Dynamics projects intelligently"
+  - "  ✅ Generate unit & integration tests with FakeXrmEasy"
+  - "  ✅ Detect anti-patterns and pipeline conflicts"
+  - "  ✅ Zero external dependencies - 100% standalone"
+
+# Core config values automatically inherited from installer:
+## user_name
+## communication_language  
+## document_output_language
+## output_folder
+
+# ============================================================================
+# MODULE CONFIGURATION FIELDS
+# ============================================================================
+
+# Project source code location
+project_source_path:
+  prompt: "Where is your Dynamics project source code located?"
+  default: "src"
+  result: "{project-root}/{value}"
+
+# Test project location
+test_output_path:
+  prompt: "Where should AVA create the test project?"
+  default: "tests"
+  result: "{project-root}/{value}"
+
+# Test framework preference
+test_framework:
+  prompt: "Which test framework do you prefer?"
+  default: "xunit"
+  result: "{value}"
+  single-select:
+    - value: "xunit"
+      label: "XUnit - Recommended for .NET Core/5+"
+    - value: "nunit"
+      label: "NUnit - Classic choice, widely used"
+    - value: "mstest"
+      label: "MSTest - Microsoft's testing framework"
+
+# FakeXrmEasy version
+fakexrmeasy_version:
+  prompt: "FakeXrmEasy version to use?"
+  default: "latest"
+  result: "{value}"
+  single-select:
+    - value: "latest"
+      label: "Latest stable version (Recommended)"
+    - value: "v9"
+      label: "FakeXrmEasy v9 for Dynamics 365 v9.x"
+    - value: "v3"
+      label: "FakeXrmEasy v3 for older Dynamics CRM"
+
+# Analysis depth
+analysis_depth:
+  prompt: "How deep should AVA analyze your code?"
+  default: "standard"
+  result: "{value}"
+  single-select:
+    - value: "quick"
+      label: "Quick - Fast scan, main components only"
+    - value: "standard"
+      label: "Standard - Balanced analysis (Recommended)"
+    - value: "deep"
+      label: "Deep - Comprehensive analysis, all details"
+
+# Generate integration tests
+generate_integration_tests:
+  prompt: "Generate integration tests (multi-artifact flows)?"
+  default: "yes"
+  result: "{value}"
+  single-select:
+    - value: "yes"
+      label: "Yes - Generate both unit and integration tests"
+    - value: "no"
+      label: "No - Only unit tests"
+
+# Code review on generation
+auto_review:
+  prompt: "Auto-run code review after test generation?"
+  default: "yes"
+  result: "{value}"
+  single-select:
+    - value: "yes"
+      label: "Yes - Review code automatically"
+    - value: "no"
+      label: "No - Manual review only"
+
+# ============================================================================
+# STATIC VALUES (not prompted, just hardcoded)
+# ============================================================================
+
+# Module version
+module_version:
+  result: "1.0.0-mvp"
+
+# Module data path
+module_data_path:
+  result: "{project-root}/.bmad/ava-dynamics-qa/data"
+
+# Anti-patterns database
+antipatterns_db:
+  result: "{project-root}/.bmad/ava-dynamics-qa/data/antipatterns.json"
+
+# Pipeline intelligence enabled
+pipeline_intelligence:
+  result: "true"
+
+# Standalone mode (no external dependencies)
+standalone_mode:
+  result: "true"

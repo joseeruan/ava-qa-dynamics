@@ -1,0 +1,112 @@
+# AVA Dynamics QA Module Metadata
+# Microsoft Dynamics 365 QA Automation Module
+
+id: ava-dynamics-qa
+name: AVA Dynamics QA
+version: 1.0.0-mvp
+description: Pipeline-aware QA automation for Microsoft Dynamics 365 with intelligent test generation
+
+# Module Type
+type: custom-module
+
+# Author Information
+author:
+  name: BMAD Community
+  email: support@bmad-method.com
+
+# Module Category
+category: quality-assurance
+tags:
+  - qa
+  - testing
+  - dynamics365
+  - microsoft
+  - unit-tests
+  - integration-tests
+  - code-review
+  - antipatterns
+
+# Module Requirements
+requirements:
+  bmad_version: ">=6.0.0-alpha"
+  node_version: ">=18.0.0"
+
+# Module Components
+components:
+  agents:
+    - id: ava
+      name: AVA - QA Dynamics Assistant
+      description: Specialized QA agent for Dynamics 365 testing
+      path: agents/ava.md
+      commands:
+        - quick-setup
+        - analyze
+        - generate-tests
+        - review
+
+  workflows:
+    - id: qa-quick-setup
+      name: Quick Setup
+      description: All-in-one setup for QA infrastructure
+      path: workflows/qa-quick-setup/workflow.yaml
+      category: setup
+      
+    - id: qa-analyze
+      name: Analyze Project
+      description: Analyze Dynamics project structure and detect issues
+      path: workflows/qa-analyze/workflow.yaml
+      category: analysis
+      
+    - id: qa-generate-tests
+      name: Generate Tests
+      description: Generate unit and integration tests with FakeXrmEasy
+      path: workflows/qa-generate-tests/workflow.yaml
+      category: generation
+      
+    - id: qa-review
+      name: Code Review
+      description: Automated code review with anti-pattern detection
+      path: workflows/qa-review/workflow.yaml
+      category: review
+
+  knowledge:
+    - antipatterns.md
+    - pipeline-execution-order.md
+    - fakexrmeasy-patterns.md
+    - testing-frameworks.md
+    - best-practices.md
+
+  templates:
+    - analysis-report.md
+    - test-helpers.cs.hbs
+    - base-test-class.cs.hbs
+    - unit-test.cs.hbs
+
+# Installation Configuration
+installer:
+  config_file: _module-installer/install-config.yaml
+  interactive: true
+  required_prompts: 7
+
+# Module Features
+features:
+  - Pipeline-aware analysis
+  - Anti-pattern detection (13 patterns)
+  - FakeXrmEasy integration
+  - Multi-framework support (XUnit, NUnit, MSTest)
+  - Zero external dependencies
+  - Standalone operation
+  - Integration with Dynamics 365 SDK
+
+# Documentation
+documentation:
+  readme: README.md
+  quick_start: README.md#quick-start
+  examples: README.md#examples
+
+# License
+license: MIT
+
+# Status
+status: mvp
+maturity: alpha
