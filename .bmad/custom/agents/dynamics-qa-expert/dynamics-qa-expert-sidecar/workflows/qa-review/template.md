@@ -1,3 +1,27 @@
+# QA Revisão de Código - Template de Relatório
+## Resumo Executivo
+- Pontuação Geral de Qualidade: {{overall_score}}/100 ({{grade}})
+- Issues Críticas: {{critical_count}}
+- Issues de Alta Severidade: {{high_count}}
+- Issues de Severidade Média: {{medium_count}}
+- Issues de Baixa Severidade: {{low_count}}
+## Achados Principais
+- Segurança: Verificação de depth, tratamento de exceções, null checks
+- Performance: Paginação, seleção de colunas, limites de consulta
+- Manutenibilidade: Complexidade, duplicação, documentação
+- Boas Práticas: Tracing, nomenclatura, padrões de arquitetura
+## Issues Detalhadas
+{{antipattern_detection_results}}
+## Recomendações
+{{prioritized_recommendations}}
+## Métricas de Comparação (se aplicável)
+{{comparison_metrics}}
+## Próximos Passos
+1. Resolver issues críticas imediatamente
+2. Planejar correções de alta severidade neste sprint
+3. Refatorar métodos complexos e adicionar documentação ausente
+4. Gerar/Melhorar testes para caminhos críticos (NUnit)
+5. Integrar revisões automatizadas ao CI/CD
 ---
 review_date: {{date}}
 review_scope: {{review_scope}}

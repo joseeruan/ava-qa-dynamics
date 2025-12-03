@@ -1,34 +1,34 @@
-# Best Practices - Knowledge Base
+# Boas Práticas - Base de Conhecimento
 
 ## About This File
 
 Este arquivo consolida boas práticas de testes para Dynamics 365 que o Marcos referencia e ensina aos usuários.
 
-## Core Testing Principles
+## Princípios Centrais de Teste
 
 ### 1. Arrange-Act-Assert Pattern
 - **Arrange**: Setup do contexto e dados de teste
 - **Act**: Executar a operação sendo testada
 - **Assert**: Verificar os resultados esperados
 
-### 2. Test Independence
+### 2. Independência dos Testes
 - Cada teste deve ser independente e poder rodar isoladamente
 - Não compartilhar estado entre testes
-- Use `[TestInitialize]` e `[TestCleanup]` apropriadamente
+- Use `[SetUp]` e `[TearDown]` (NUnit) apropriadamente
 
-### 3. Clear Test Names
+### 3. Nomes de Teste Claros
 - Nomes devem descrever o cenário e resultado esperado
 - Pattern: `MethodName_Scenario_ExpectedBehavior`
 - Exemplo: `Create_WithValidData_ShouldSetDefaultValues`
 
-### 4. One Assertion Per Test
+### 4. Uma Asserção por Teste (preferencial)
 - Preferencialmente um conceito por teste
 - Múltiplas assertions OK se validam o mesmo resultado
 - Facilita identificar falhas específicas
 
-## Dynamics 365 Specific Practices
+## Práticas Específicas do Dynamics 365
 
-### Plugin Testing
+### Testes de Plugins
 
 **Mock IOrganizationService:**
 ```csharp
@@ -56,7 +56,7 @@ var plugin = context.ExecutePluginWith<YourPlugin>(
 );
 ```
 
-### Test Coverage Goals
+### Metas de Cobertura de Testes
 
 1. **Happy Path**: Cenário ideal sem erros
 2. **Validation Failures**: Dados inválidos ou incompletos
@@ -64,7 +64,7 @@ var plugin = context.ExecutePluginWith<YourPlugin>(
 4. **Exception Handling**: Comportamento em caso de erros
 5. **Edge Cases**: Limites e situações extremas
 
-### Common Pitfalls to Avoid
+### Erros Comuns a Evitar
 
 ❌ **Não fazer**: Testar funcionalidade do CRM
 ✅ **Fazer**: Testar apenas lógica do seu plugin
@@ -78,7 +78,7 @@ var plugin = context.ExecutePluginWith<YourPlugin>(
 ❌ **Não fazer**: Testes que levam muito tempo
 ✅ **Fazer**: Testes rápidos (< 1 segundo cada)
 
-## Performance Best Practices
+## Boas Práticas de Performance
 
 ### Test Execution Speed
 - Minimize operações de I/O
@@ -90,13 +90,15 @@ var plugin = context.ExecutePluginWith<YourPlugin>(
 - Setup apenas o necessário para o teste
 - Cleanup após testes se necessário
 
-## Documentation Practices
+## Práticas de Documentação
 
 ### Self-Documenting Tests
 ```csharp
-[TestMethod]
-[TestCategory("Plugin")]
-[TestCategory("Create")]
+using NUnit.Framework;
+
+[Test]
+[Category("Plugin")]
+[Category("Create")]
 public void CreateContact_WithoutEmailAddress_ShouldThrowInvalidPluginExecutionException()
 {
     // Arrange: Setup contact without required email
@@ -108,19 +110,19 @@ public void CreateContact_WithoutEmailAddress_ShouldThrowInvalidPluginExecutionE
     };
     
     // Act & Assert: Expect exception
-    Assert.ThrowsException<InvalidPluginExecutionException>(() => 
+    Assert.Throws<InvalidPluginExecutionException>(() => 
     {
         ExecutePlugin(contact);
     });
 }
 ```
 
-### Test Categories
-Use `[TestCategory]` para organizar:
-- Por entidade: `[TestCategory("Contact")]`
-- Por operação: `[TestCategory("Create")]`
-- Por fase: `[TestCategory("PreValidation")]`
-- Por criticidade: `[TestCategory("Critical")]`
+### Categorias de Teste
+Use `[Category]` (NUnit) para organizar:
+- Por entidade: `[Category("Contact")]`
+- Por operação: `[Category("Create")]`
+- Por fase: `[Category("PreValidation")]`
+- Por criticidade: `[Category("Critical")]`
 
 ## Maintenance Practices
 

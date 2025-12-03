@@ -1,10 +1,10 @@
-# Project Patterns - Knowledge Base
+# Padrões de Projeto - Base de Conhecimento
 
-## About This File
+## Sobre Este Arquivo
 
 Este arquivo armazena padrões específicos de projetos que o Marcos aprende ao longo do tempo. Esses padrões ajudam a gerar testes consistentes com as convenções de cada projeto.
 
-## Naming Conventions
+## Convenções de Nomenclatura
 
 <!-- Padrões de nomenclatura aprendidos -->
 
@@ -16,7 +16,7 @@ Este arquivo armazena padrões específicos de projetos que o Marcos aprende ao 
 - Pattern: (a ser aprendido)
 - Example: (a ser documentado)
 
-## Project Structures
+## Estruturas de Projeto
 
 <!-- Estruturas de organização de testes -->
 
@@ -28,14 +28,14 @@ Este arquivo armazena padrões específicos de projetos que o Marcos aprende ao 
 - Pattern: (a ser aprendido)
 - Example: (a ser documentado)
 
-## Framework Preferences
+## Preferências de Framework
 
 <!-- Frameworks e bibliotecas preferidas por projeto -->
 
-### Testing Frameworks
-- Primary: (NUnit/xUnit/MSTest/)
-- Mocking: (FakeXrmEasy/Moq/Both)
-- Assertions: (FluentAssertions/native)
+### Frameworks de Teste
+- Principal: NUnit
+- Mocking: FakeXrmEasy e Moq
+- Asserções: FluentAssertions ou nativas
 
 ## Common Patterns
 

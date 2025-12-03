@@ -1,19 +1,19 @@
-# QA Code Review - Automated Quality Analysis Instructions
+# QA Revisão de Código - Instruções de Análise Automática de Qualidade
 
 <critical>The workflow execution engine is governed by: {project-root}/.bmad/core/tasks/workflow.xml</critical>
-<critical>This is a DOCUMENT workflow - outputs markdown review report to {default_output_file}</critical>
-<critical>Communicate in {communication_language}</critical>
+<critical>Este é um workflow de DOCUMENTO - gera relatório de revisão em markdown em {default_output_file}</critical>
+<critical>Comunique-se em {communication_language}</critical>
 
 <workflow>
 
-<step n="1" goal="Define review scope">
-  <ask>What would you like to review?
-    1. Full project (all code)
-    2. Recent changes (git diff)
-    3. Specific files or components
-    4. Pull request / branch comparison
+<step n="1" goal="Definir escopo da revisão">
+  <ask>O que você gostaria de revisar?
+    1. Projeto completo (todo o código)
+    2. Mudanças recentes (git diff)
+    3. Arquivos ou componentes específicos
+    4. Pull request / comparação de branch
   </ask>
-  <action>Store as {{review_scope}}</action>
+  <action>Armazenar como {{review_scope}}</action>
   
   <action if="scope=full project">
     <ask>Source path? (Default: {default_source_path})</ask>
@@ -38,14 +38,14 @@
     <action>Store as {{review_files}} and {{pr_context}}</action>
   </action>
   
-  <ask>Review strictness: {antipattern_strictness} - Change? [y/n]</ask>
-  <action if="yes">Ask for: relaxed, balanced, or strict</action>
-  <action>Store as {{review_strictness}}</action>
+  <ask>Rigor da revisão: {antipattern_strictness} - Alterar? [s/n]</ask>
+  <action if="yes">Perguntar: relaxado, balanceado ou estrito</action>
+  <action>Armazenar como {{review_strictness}}</action>
 </step>
 
-<step n="2" goal="Load anti-pattern database">
-  <action>Load anti-pattern definitions from: {data_path}/dynamics-antipatterns.json</action>
-  <action>Load best practices from: {data_path}/best-practices.json</action>
+<step n="2" goal="Carregar base de anti-padrões">
+  <action>Carregar definições de anti-padrões de: {data_path}/dynamics-antipatterns.json</action>
+  <action>Carregar boas práticas de: {data_path}/best-practices.json</action>
   
   <action>Filter patterns based on {{review_strictness}}:
     - Relaxed: Only critical severity
@@ -53,7 +53,7 @@
     - Strict: All severity levels
   </action>
   
-  <action>Prepare detection rules for:
+  <action>Preparar regras de detecção para:
     - Missing depth validation
     - Unhandled exceptions
     - Unpaginated queries
@@ -66,24 +66,24 @@
   </action>
 </step>
 
-<step n="3" goal="Analyze code for anti-patterns">
-  <action>For each file in {{review_files}}:</action>
+<step n="3" goal="Analisar código por anti-padrões">
+  <action>Para cada arquivo em {{review_files}}:</action>
   
-  <action>Parse code structure:
+  <action>Parsear estrutura do código:
     - Identify classes and methods
     - Extract logic flow
     - Map dependencies
     - Calculate cyclomatic complexity
   </action>
   
-  <action>Run anti-pattern detection:</action>
+  <action>Executar detecção de anti-padrões:</action>
   
   <check category="Critical" severity="10">
     <pattern id="missing-depth-check">
-      <detection>Plugin Execute method without context.Depth validation</detection>
+      <detection>Método Execute de plugin sem validação de context.Depth</detection>
       <location>{{file}}:{{line}}</location>
-      <description>Missing depth check creates infinite loop risk</description>
-      <fix>Add at start of Execute: if (context.Depth > 1) return;</fix>
+      <description>Sem verificação de depth há risco de loop infinito</description>
+      <fix>Adicionar no início do Execute: if (context.Depth > 1) return;</fix>
       <example>
         ```csharp
         // Before (DANGEROUS)
@@ -96,86 +96,92 @@
         public void Execute(IServiceProvider serviceProvider) {
             var context = (IPluginExecutionContext)serviceProvider.GetService(...);
             if (context.Depth > 1) return; // Prevent infinite loops
+        # QA Review – Instruções (pt-BR)
+
+        Este fluxo orienta a revisão técnica e funcional de Plugins do Dynamics 365/Dataverse e Funções Azure relacionadas, priorizando legibilidade, corretude, integridade e manutenção. Utilize Português-Brasil.
+
+        ## Objetivos
+        - Identificar problemas de arquitetura, legibilidade e manutenção.
+        - Detectar antipadrões e riscos funcionais.
+        - Validar integridade das regras de negócio e contratos (entrada/saída).
+        - Sugerir melhorias objetivas com exemplos práticos.
+
+        ## Escopo
+        - Plugins Dynamics 365/Dataverse (C#).
+        - Funções Azure que integram com Dataverse.
+        - Testes automatizados com prioridade para NUnit; uso de FakeXrmEasy e Moq.
+
+        ## Checklist de Revisão
+        1. Arquitetura e Organização
+          - Separação de responsabilidades (SRP), baixo acoplamento, nomeação clara.
+          - Interfaces e injeção de dependências quando aplicável.
+          - Evitar lógica extensa em `Execute`; preferir serviços/fábricas auxiliares.
+        2. Legibilidade e Manutenção
+          - Métodos curtos, nomes descritivos, early return para reduzir complexidade.
+          - Comentários apenas quando agregam contexto; evitar comentários redundantes.
+          - Padronização de estilos e convenções do projeto.
+        3. Correção Funcional
+          - Pré-condições: nulos, ranges, tipos, formatos bem validados.
+          - Tratamento de exceções com mensagens úteis sem vazar detalhes sensíveis.
+          - Validação de parâmetros de entrada e consistência da saída.
+        4. Integridade e Regras de Negócio
+          - Enumerar invariantes e regras que devem se manter sempre.
+          - Verificar efeitos colaterais: criação/atualização/exclusão em entidades corretas.
+          - Garantir idempotência quando necessário; evitar inconsistências transacionais.
+        5. Desempenho e Resiliência
+          - Minimizar chamadas desnecessárias ao Dataverse; usar batching quando aplicável.
+          - Retentativas com backoff para operações externas (quando apropriado).
+          - Timeouts e limites adequados; circuit breakers onde cabível.
+        6. Segurança e Conformidade
+          - Sem credenciais em código; usar configuração segura.
+          - Controle de acesso e escopo corretamente aplicados.
+          - Sanitização de entradas e logs sem dados sensíveis.
+        7. Testes Automatizados (NUnit prioritário)
+          - Cobrir todos os métodos públicos relevantes, inclusive caminhos de erro.
+          - Usar FakeXrmEasy e Moq para isolar dependências.
+          - Incluir asserts de integridade cobrindo invariantes e contratos.
+
+        ## Itens Específicos – Plugins
+        - Validar estágio `PreOperation`/`PostOperation` e contexto de mensagem (Create/Update/Delete).
+        - Checar uso de `IOrganizationService` com `CallerId` correto quando necessário.
+        - Mapear entidades e atributos obrigatórios; prevenir `InvalidPluginExecutionException` inconsistente.
+        - Evitar `Service Fault` genérico; usar mensagens claras e categorizadas.
+
+        ## Itens Específicos – Azure Functions
+        - Triggers e Bindings corretos (HTTP/Queue/ServiceBus); modelos de request/response.
+        - `HttpClient`: `HttpMessageHandler` mockável, timeouts, reutilização e DI.
+        - Validação de headers, autenticação e payloads; códigos de status previsíveis.
+        - Integração com Dataverse: tratamento de falhas, retentativas e consistência.
+
+        ## Saída Esperada
+        - Lista de problemas priorizada (Alta/Média/Baixa) com exemplos.
+        - Recomendações específicas com snippets (NUnit quando aplicável).
+        - Itens de ação: correções rápidas e plano de refatoração.
+
+        ## Exemplo de Recomendação (NUnit)
+        ```csharp
+        [Test]
+        public void Deve_Lancar_Excecao_Quando_Entrada_Invalida()
+        {
+           // Arrange
+           var sut = new MeuPlugin(servico, contextoValido);
+           object entrada = null;
+
+           // Act & Assert
+           Assert.Throws<InvalidPluginExecutionException>(() => sut.Execute(entrada));
         }
         ```
-      </example>
-    </pattern>
-    
-    <pattern id="unhandled-exception">
-      <detection>Plugin/workflow Execute without try-catch</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>Unhandled exceptions crash platform operations</description>
-      <fix>Wrap Execute body in try-catch, throw InvalidPluginExecutionException</fix>
-    </pattern>
-    
-    <pattern id="sync-http-call">
-      <detection>HttpClient or WebRequest in sync plugin</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>Synchronous plugins timeout with external calls</description>
-      <fix>Move to async plugin or use async/await properly</fix>
-    </pattern>
-  </check>
-  
-  <check category="High" severity="7-9">
-    <pattern id="unpaginated-query">
-      <detection>QueryExpression without TopCount or PagingInfo</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>Retrieving all records causes performance issues</description>
-      <fix>Add query.TopCount = 5000 or implement pagination</fix>
-    </pattern>
-    
-    <pattern id="all-columns">
-      <detection>ColumnSet(true) or AllColumns usage</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>Retrieving all columns impacts performance</description>
-      <fix>Specify only needed columns: new ColumnSet("field1", "field2")</fix>
-    </pattern>
-    
-    <pattern id="hardcoded-guid">
-      <detection>new Guid("...") in business logic</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>Hardcoded GUIDs break across environments</description>
-      <fix>Lookup by name, use config, or environment variables</fix>
-    </pattern>
-    
-    <pattern id="missing-tracing">
-      <detection>Plugin without ITracingService usage</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>No diagnostics available when debugging</description>
-      <fix>Get ITracingService and add trace.Trace() calls</fix>
-    </pattern>
-    
-    <pattern id="missing-null-check">
-      <detection>entity["field"] without Contains check</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>NullReferenceException if field not present</description>
-      <fix>Check: if (entity.Contains("field") && entity["field"] != null)</fix>
-    </pattern>
-    
-    <pattern id="missing-image-check">
-      <detection>PreEntityImages[name] without Contains validation</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>KeyNotFoundException if image not registered</description>
-      <fix>Check: if (context.PreEntityImages.Contains("imageName"))</fix>
-    </pattern>
-  </check>
-  
-  <check category="Medium" severity="4-6">
-    <pattern id="complex-method">
-      <detection>Method with cyclomatic complexity > 10</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>High complexity makes code hard to test and maintain</description>
-      <fix>Refactor into smaller methods with single responsibility</fix>
-    </pattern>
-    
-    <pattern id="long-method">
-      <detection>Method with > 100 lines</detection>
-      <location>{{file}}:{{line}}</location>
-      <description>Long methods are hard to understand and test</description>
-      <fix>Extract logical blocks into separate methods</fix>
-    </pattern>
-    
-    <pattern id="duplicate-code">
+
+        ## Checklist Complementar de Integridade (NUnit)
+        - Cobertura de invariantes: cada regra de negócio possui ao menos um teste de violação e um de conformidade.
+        - Contratos de I/O: validar tipos, formatos e estados resultantes após operação.
+        - Efeitos colaterais: asserts em entidades/atributos alterados e eventos gerados.
+        - Exceções: usar `Assert.Throws`/`Assert.DoesNotThrow` para caminhos negativos/positivos.
+
+        ## Próximos Passos
+        - Se faltarem testes: utilize o fluxo “QA Gerar Testes” (NUnit) para cobrir métodos e invariantes.
+        - Problemas de arquitetura: planejar refatorações graduais, criar serviços auxiliares e reduzir complexidade de `Execute`.
+        - Para Funções Azure: adicionar testes com `HttpMessageHandler` mockado e validar códigos de status e headers.
       <detection>Code blocks repeated > 2 times</detection>
       <location>Multiple locations</location>
       <description>Duplication makes maintenance difficult</description>
@@ -213,7 +219,7 @@
     </pattern>
   </check>
   
-  <action>Record each detected issue with:
+  <action>Registrar cada issue detectada com:
     - Pattern ID
     - File and line number
     - Code snippet (3 lines context)
@@ -226,8 +232,8 @@
   <template-output>antipattern_detection_results</template-output>
 </step>
 
-<step n="4" goal="Calculate quality score">
-  <action>Calculate overall quality score (0-100):</action>
+<step n="4" goal="Calcular pontuação de qualidade">
+  <action>Calcular pontuação geral de qualidade (0-100):</action>
   
   <calculation>
     Base score: 100
@@ -242,13 +248,13 @@
     Maximum score: 100
   </calculation>
   
-  <action>Calculate category breakdown:</action>
+  <action>Calcular distribuição por categoria:</action>
   <metric>Code Safety Score: Based on critical issues (depth checks, exception handling, null checks)</metric>
   <metric>Performance Score: Based on query optimization, pagination, column sets</metric>
   <metric>Maintainability Score: Based on complexity, documentation, code organization</metric>
   <metric>Best Practices Score: Based on tracing, naming, patterns adherence</metric>
   
-  <action>Determine quality grade:
+  <action>Determinar nota de qualidade:
     - A (90-100): Excellent
     - B (80-89): Good
     - C (70-79): Acceptable
@@ -259,8 +265,8 @@
   <template-output>quality_score</template-output>
 </step>
 
-<step n="5" goal="Analyze test coverage" optional="true">
-  <ask>Check test coverage for reviewed components? [y/n]</ask>
+<step n="5" goal="Analisar cobertura de testes" optional="true">
+  <ask>Checar cobertura de testes para componentes revisados? [s/n]</ask>
   
   <action if="yes">
     <action>For each reviewed class:
@@ -269,7 +275,7 @@
       - If not found: Flag as "No tests"
     </action>
     
-    <action>Calculate coverage metrics:
+    <action>Calcular métricas de cobertura:
       - Classes with tests: {{tested_classes}}/{{total_classes}}
       - Methods with tests: {{tested_methods}}/{{total_methods}}
       - Estimated line coverage: {{estimated_coverage}}%
@@ -279,9 +285,9 @@
   <template-output>test_coverage_analysis</template-output>
 </step>
 
-<step n="6" goal="Generate prioritized recommendations">
-  <action>Sort all detected issues by severity</action>
-  <action>Group by category (Safety, Performance, Maintainability, Best Practices)</action>
+<step n="6" goal="Gerar recomendações priorizadas">
+  <action>Ordenar todas as issues detectadas por severidade</action>
+  <action>Agrupar por categoria (Segurança, Performance, Manutenibilidade, Boas Práticas)</action>
   
   <action>Generate action plan:</action>
   
@@ -314,8 +320,8 @@
   <template-output>prioritized_recommendations</template-output>
 </step>
 
-<step n="7" goal="Generate comparison metrics" if="review_scope=recent changes OR pull request">
-  <action>Compare current state to previous:</action>
+<step n="7" goal="Gerar métricas de comparação" if="review_scope=recent changes OR pull request">
+  <action>Comparar estado atual com anterior:</action>
   
   <metric>Issues introduced in this change: {{new_issues_count}}</metric>
   <metric>Issues fixed in this change: {{fixed_issues_count}}</metric>
@@ -324,23 +330,23 @@
   <action>Determine if quality improved, degraded, or stayed same</action>
   
   <action if="PR context">
-    <action>Generate PR review comment summary:
-      - Overall assessment (Approve / Request Changes / Comment)
-      - Critical blockers (if any)
-      - Suggested improvements
-      - Positive feedback on good practices
+    <action>Gerar resumo de comentários da revisão de PR:
+      - Avaliação geral (Aprovar / Solicitar mudanças / Comentar)
+      - Bloqueadores críticos (se houver)
+      - Melhorias sugeridas
+      - Feedback positivo sobre boas práticas
     </action>
   </action>
   
   <template-output>comparison_metrics</template-output>
 </step>
 
-<step n="8" goal="Finalize code review report">
-  <action>Compile complete review report</action>
-  <action>Add executive summary</action>
-  <action>Include all sections: score, issues, recommendations, metrics</action>
-  <action>Add visualizations (charts, graphs) if applicable</action>
-  <action>Save to: {default_output_file}</action>
+<step n="8" goal="Finalizar relatório de revisão de código">
+  <action>Compilar relatório de revisão completo</action>
+  <action>Adicionar resumo executivo</action>
+  <action>Incluir todas as seções: pontuação, issues, recomendações, métricas</action>
+  <action>Adicionar visualizações (gráficos) se aplicável</action>
+  <action>Salvar em: {default_output_file}</action>
   
   <action>Inform user:
     - Code review complete! 🧪
@@ -350,37 +356,37 @@
   </action>
 </step>
 
-<step n="9" goal="Provide actionable next steps">
-  <action>Based on review results, suggest:</action>
+<step n="9" goal="Fornecer próximos passos acionáveis">
+  <action>Com base nos resultados da revisão, sugerir:</action>
   
   <action if="critical issues found">
-    ⚠️ URGENT: Address {{critical_count}} critical issues immediately
-    Use report to locate and fix each issue
-    Re-run review after fixes
+    ⚠️ URGENTE: Resolver {{critical_count}} issues críticas imediatamente
+    Use o relatório para localizar e corrigir cada issue
+    Re-execute a revisão após as correções
   </action>
   
   <action if="no tests found">
-    💡 Generate tests using [GT] Generate Tests workflow
-    Recommended for {{untested_classes_count}} untested classes
+    💡 Gerar testes usando o workflow [GT] Gerar Testes
+    Recomendado para {{untested_classes_count}} classes sem teste
   </action>
   
   <action if="score < 70">
-    📈 Consider refactoring session
-    Focus on top {{top_issues_count}} high-impact issues
-    Track improvement with monthly reviews
+    📈 Considerar sessão de refatoração
+    Focar nas {{top_issues_count}} issues de maior impacto
+    Acompanhar melhoria com revisões mensais
   </action>
   
   <action if="score >= 90">
-    ✨ Excellent code quality!
-    Maintain standards with automated reviews in CI/CD
-    Share best practices with team
+    ✨ Qualidade de código excelente!
+    Manter padrões com revisões automatizadas em CI/CD
+    Compartilhar boas práticas com a equipe
   </action>
   
-  <ask>Would you like to:
-    - [V] View full report
-    - [F] Fix issues now (open files in editor)
-    - [R] Re-run review (after fixes)
-    - [E] Exit
+  <ask>Gostaria de:
+    - [V] Ver relatório completo
+    - [F] Corrigir issues agora (abrir arquivos no editor)
+    - [R] Reexecutar revisão (após correções)
+    - [E] Sair
   </ask>
   
   <action if="V">Display complete report</action>
