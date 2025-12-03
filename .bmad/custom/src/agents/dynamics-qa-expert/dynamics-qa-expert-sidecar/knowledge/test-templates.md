@@ -2,10 +2,26 @@
 
 Este arquivo fornece templates prontos para criação de testes unitários em projetos Dynamics 365 (plugins) e Azure Functions, utilizando NUnit, Moq e FakeXrmEasy quando aplicável.
 
+## DEPENDÊNCIAS OBRIGATÓRIAS (MANDATÓRIO)
+
+**SEMPRE use estas versões exatas dos pacotes:**
+
+```xml
+<PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.*" PrivateAssets="All" />
+<PackageReference Include="Microsoft.PowerApps.MSBuild.Plugin" Version="1.*" PrivateAssets="All" />
+<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.*" PrivateAssets="All" />
+<PackageReference Include="NUnit" Version="3.13.3" />
+<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" PrivateAssets="All" />
+<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+<PackageReference Include="FakeXrmEasy.365" Version="1.58.1" />
+```
+
+**CRÍTICO:** Nunca sugira ou use versões diferentes. Estas são testadas e validadas.
+
 ## 1) Plugins Dynamics 365 (NUnit + FakeXrmEasy + Moq)
 
 Pré-requisitos:
-- Pacotes: `NUnit`, `Moq`, `FakeXrmEasy`, `Microsoft.CrmSdk.CoreAssemblies`
+- Pacotes: Ver seção "DEPENDÊNCIAS OBRIGATÓRIAS" acima para versões exatas
 - Estrutura de projeto: `src/<Projeto>.Tests/`
 
 Exemplo de template:

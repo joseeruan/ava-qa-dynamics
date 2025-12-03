@@ -4,6 +4,34 @@
 
 Este arquivo consolida boas práticas de testes para Dynamics 365 que o Marcos referencia e ensina aos usuários.
 
+## Dependências Obrigatórias (MANDATÓRIO)
+
+**SEMPRE use estas versões exatas de pacotes para testes de plugins:**
+
+```xml
+<PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.*" PrivateAssets="All" />
+<PackageReference Include="Microsoft.PowerApps.MSBuild.Plugin" Version="1.*" PrivateAssets="All" />
+<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.*" PrivateAssets="All" />
+<PackageReference Include="NUnit" Version="3.13.3" />
+<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" PrivateAssets="All" />
+<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+<PackageReference Include="FakeXrmEasy.365" Version="1.58.1" />
+```
+
+**Por Que Estas Versões:**
+- `Microsoft.CrmSdk.CoreAssemblies 9.0.2.*`: Core Dynamics 365 SDK assemblies
+- `Microsoft.PowerApps.MSBuild.Plugin 1.*`: PowerApps build tools para plugins
+- `Microsoft.NETFramework.ReferenceAssemblies 1.0.*`: .NET Framework reference assemblies
+- `NUnit 3.13.3`: Framework de teste (versão estável)
+- `NUnit3TestAdapter 4.5.0`: VS Test adapter para NUnit
+- `Microsoft.NET.Test.Sdk 17.8.0`: .NET Test SDK
+- `FakeXrmEasy.365 1.58.1`: Framework de mocking para Dynamics 365
+
+**Regras:**
+- Sempre valide estas versões nos arquivos de projeto
+- Recomende estas versões ao criar novos projetos de teste
+- Nunca sugira versões alternativas, a menos que explicitamente solicitado
+
 ## Princípios Centrais de Teste
 
 ### 1. Arrange-Act-Assert Pattern
